@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="255.0" prefWidth="214.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="registro.FXMLloginController">
+   <children>
+      <VBox layoutX="27.0" layoutY="14.0" spacing="5.0">
+         <children>
+            <Label layoutX="27.0" layoutY="14.0" text="Usuario">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <TextField fx:id="user" layoutX="27.0" layoutY="43.0">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </TextField>
+            <Label layoutX="10.0" layoutY="10.0" text="Contraseña">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <PasswordField fx:id="pswd">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </PasswordField>
+            <Label layoutX="10.0" layoutY="10.0" text="Servidor">
+               <font>
+                  <Font size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="server" layoutX="10.0" layoutY="34.0">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </TextField>
+         </children>
+      </VBox>
+      <HBox alignment="BOTTOM_RIGHT" layoutX="27.0" layoutY="208.0" prefHeight="29.0" prefWidth="162.0" spacing="30.0">
+         <children>
+            <Button layoutX="27.0" layoutY="223.0" mnemonicParsing="false" onAction="#pbCancelarFired" text="Cancelar">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            <Button defaultButton="true" layoutX="126.0" layoutY="221.0" mnemonicParsing="false" onAction="#pbAceptarFired" text="Aceptar">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
