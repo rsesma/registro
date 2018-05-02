@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="405.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="registro.FXMLidController">
+   <children>
+      <TableView fx:id="lista" layoutX="31.0" layoutY="59.0" prefHeight="257.0" prefWidth="343.0">
+        <columns>
+          <TableColumn fx:id="idCol" editable="false" prefWidth="72.0" text="Id" />
+          <TableColumn fx:id="nomCol" editable="false" prefWidth="246.0" text="Paciente" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

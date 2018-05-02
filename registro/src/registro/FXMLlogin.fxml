@@ -8,8 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="255.0" prefWidth="214.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="registro.FXMLloginController">
+<AnchorPane id="AnchorPane" prefHeight="255.0" prefWidth="214.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLloginController">
    <children>
       <VBox layoutX="27.0" layoutY="14.0" spacing="5.0">
          <children>
@@ -48,7 +47,7 @@
             </TextField>
          </children>
       </VBox>
-      <HBox alignment="BOTTOM_RIGHT" layoutX="27.0" layoutY="208.0" prefHeight="29.0" prefWidth="162.0" spacing="30.0">
+      <HBox alignment="BOTTOM_RIGHT" layoutX="27.0" layoutY="208.0" prefHeight="29.0" prefWidth="162.0" spacing="10.0">
          <children>
             <Button layoutX="27.0" layoutY="223.0" mnemonicParsing="false" onAction="#pbCancelarFired" text="Cancelar">
                <font>

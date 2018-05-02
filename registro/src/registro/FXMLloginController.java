@@ -30,11 +30,14 @@ public class FXMLloginController implements Initializable {
     private TextField server;
     
     public getRegistroData d;
+    
+    public Boolean lOk;
 
     @FXML
     private void pbAceptarFired(ActionEvent event) {
         try {
             if (d.getConnection(user.getText(),pswd.getText(),server.getText())) {
+                lOk = true;
                 closeWindow();
             }
         } catch (Exception e) {

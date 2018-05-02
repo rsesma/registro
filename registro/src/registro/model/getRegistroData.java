@@ -7,6 +7,7 @@ package registro.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javafx.scene.control.Alert;
 
@@ -19,7 +20,6 @@ public class getRegistroData {
     public String server;
     public String user;
     public String pswd;
-    public Boolean connected;
     private static Connection conn;
     
     
@@ -28,7 +28,6 @@ public class getRegistroData {
         server = "";
         user = "";
         pswd = "";
-        connected = false;
     }
     
     public Boolean getConnection(String u, String p, String s) throws SQLException {
@@ -39,12 +38,20 @@ public class getRegistroData {
             conn = DriverManager.getConnection(
                     C_DRIVER + "://" + server + ":3306/registro",
                     user,pswd);
-            connected = true;
             return true;
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
             alert.showAndWait();
             return false;
+        }
+    }
+    
+    public ResultSet getListaIdRs(String filter) throws SQLException {
+        if (filter.length()>0) {
+            return conn.prepareStatement("SELECT * FROM lista_id_nombre WHERE " + filter).executeQuery();
+        }
+        else {
+            return conn.prepareStatement("SELECT * FROM lista_id_nombre").executeQuery();
         }
     }
 }

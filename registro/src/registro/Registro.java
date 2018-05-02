@@ -30,14 +30,23 @@ public class Registro extends Application {
         stage0.initModality(Modality.WINDOW_MODAL);
         stage0.setTitle("Log in");
         stage0.setScene(new Scene(r2));
-        FXMLloginController controller = fxmlLoader.<FXMLloginController>getController();
-        controller.d = d;
+        FXMLloginController login = fxmlLoader.<FXMLloginController>getController();
+        login.d = d;
+        login.lOk = false;
         stage0.showAndWait();
         
-        if (d.connected) {
-            Parent root = FXMLLoader.load(getClass().getResource("FXMLregistro.fxml"));
+        if (login.lOk) {
+            // Launch main app window
+            FXMLLoader fxmlReg = new FXMLLoader(getClass().getResource("FXMLregistro.fxml")); 
+            Parent root = (Parent) fxmlReg.load(); 
+            
+            stage.setTitle("Registro de pacientes");
             Scene scene = new Scene(root);
             stage.setScene(scene);
+            
+            FXMLregistroController reg = fxmlReg.<FXMLregistroController>getController();
+            reg.d = d;
+            
             stage.show();
         }
     }
