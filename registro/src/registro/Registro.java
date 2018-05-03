@@ -23,19 +23,26 @@ public class Registro extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
+        Boolean lContinue = true;
+
         // Launch login window
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLlogin.fxml")); 
-        Parent r2 = (Parent) fxmlLoader.load(); 
-        Stage stage0 = new Stage(); 
-        stage0.initModality(Modality.WINDOW_MODAL);
-        stage0.setTitle("Log in");
-        stage0.setScene(new Scene(r2));
-        FXMLloginController login = fxmlLoader.<FXMLloginController>getController();
-        login.d = d;
-        login.lOk = false;
-        stage0.showAndWait();
+        if (false) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLlogin.fxml")); 
+            Parent r2 = (Parent) fxmlLoader.load(); 
+            Stage stage0 = new Stage(); 
+            stage0.initModality(Modality.WINDOW_MODAL);
+            stage0.setTitle("Log in");
+            stage0.setScene(new Scene(r2));
+            FXMLloginController login = fxmlLoader.<FXMLloginController>getController();
+            login.d = d;
+            login.lOk = false;
+            stage0.showAndWait();
+            lContinue = login.lOk;
+        } else {
+            d.getConnection("rsesma", "amsesr", "127.0.0.1");
+        }
         
-        if (login.lOk) {
+        if (lContinue) {
             // Launch main app window
             FXMLLoader fxmlReg = new FXMLLoader(getClass().getResource("FXMLregistro.fxml")); 
             Parent root = (Parent) fxmlReg.load(); 
@@ -45,7 +52,7 @@ public class Registro extends Application {
             stage.setScene(scene);
             
             FXMLregistroController reg = fxmlReg.<FXMLregistroController>getController();
-            reg.d = d;
+            reg.SetData(d);
             
             stage.show();
         }

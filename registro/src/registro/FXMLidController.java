@@ -16,7 +16,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import registro.model.Paciente;
 import registro.model.getRegistroData;
 
@@ -49,6 +48,12 @@ public class FXMLidController implements Initializable {
         nomCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
         
         lista.setItems(listaData);
+        try {
+            ResultSet rs = this.d.getListaIdRs("");
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
         LoadTable("");
     }    
     
@@ -67,4 +72,9 @@ public class FXMLidController implements Initializable {
             System.out.println(e.getMessage());
         }
     }
+    
+    public void SetData(getRegistroData data) {
+        this.d = data;
+    }
+
 }

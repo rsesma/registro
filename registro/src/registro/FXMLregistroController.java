@@ -40,7 +40,7 @@ public class FXMLregistroController implements Initializable {
             stage.setTitle("Escoger identificador");
             stage.setScene(new Scene(r));
             FXMLidController controller = fxmlLoader.<FXMLidController>getController();
-            controller.d = d;
+            controller.SetData(this.d);
             stage.showAndWait();
         } catch(Exception e) {
             System.out.println(e.getMessage());
@@ -68,5 +68,8 @@ public class FXMLregistroController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }    
-    
+
+    public void SetData(getRegistroData data) {
+        this.d = data;
+    }    
 }
