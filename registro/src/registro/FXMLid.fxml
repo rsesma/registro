@@ -1,19 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="405.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="registro.FXMLidController">
+<AnchorPane id="AnchorPane" prefHeight="370.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidController">
    <children>
-      <TableView fx:id="lista" layoutX="31.0" layoutY="59.0" prefHeight="257.0" prefWidth="343.0">
+      <Label layoutX="26.0" layoutY="14.0" text="Buscar:">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <TextField fx:id="search" layoutX="26.0" layoutY="33.0" prefHeight="29.0" prefWidth="243.0" promptText="Identificador o Nombre">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </TextField>
+      <TableView fx:id="table" layoutX="26.0" layoutY="74.0" prefHeight="235.0" prefWidth="313.0">
         <columns>
-          <TableColumn fx:id="idCol" editable="false" prefWidth="72.0" text="Id" />
-          <TableColumn fx:id="nomCol" editable="false" prefWidth="246.0" text="Paciente" />
+          <TableColumn fx:id="idCol" prefWidth="50.0" text="Id" />
+            <TableColumn fx:id="nomCol" prefWidth="223.0" text="Nombre" />
         </columns>
       </TableView>
+      <HBox layoutX="274.0" layoutY="35.0" spacing="5.0">
+         <children>
+            <Button fx:id="pbSearch" defaultButton="true" ellipsisString="" layoutX="274.0" layoutY="35.0" mnemonicParsing="false" onAction="#searchFired" prefHeight="25.0" prefWidth="25.0" textAlignment="CENTER" />
+            <Button fx:id="pbNoFilter" ellipsisString="" layoutX="305.0" layoutY="35.0" mnemonicParsing="false" onAction="#noFilterFired" prefHeight="25.0" prefWidth="25.0" textAlignment="CENTER" />
+         </children>
+      </HBox>
+      <Label fx:id="total" layoutX="26.0" layoutY="315.0" text="Label" />
+      <HBox layoutX="153.0" layoutY="318.0" spacing="5.0">
+         <children>
+            <Button cancelButton="true" layoutX="207.0" layoutY="347.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#newFired" prefHeight="30.0" text="Nuevo">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            <Button layoutX="277.0" layoutY="347.0" mnemonicParsing="false" onAction="#editFired" prefHeight="30.0" text="Editar">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

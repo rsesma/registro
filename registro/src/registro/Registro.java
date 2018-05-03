@@ -39,7 +39,7 @@ public class Registro extends Application {
             stage0.showAndWait();
             lContinue = login.lOk;
         } else {
-            d.getConnection("rsesma", "amsesr", "127.0.0.1");
+            d.getConnection("rsesma", "amsesr1977", "192.168.1.69");
         }
         
         if (lContinue) {
@@ -53,6 +53,7 @@ public class Registro extends Application {
             
             FXMLregistroController reg = fxmlReg.<FXMLregistroController>getController();
             reg.SetData(d);
+            
             
             stage.show();
         }

@@ -47,8 +47,6 @@ public class getRegistroData {
     }
     
     public ResultSet getListaIdRs(String filter) throws SQLException {
-        System.out.println("hola");
-        System.out.println(filter);
         if (filter.length()>0) {
             return conn.prepareStatement("SELECT * FROM lista_id_nombre WHERE " + filter).executeQuery();
         }

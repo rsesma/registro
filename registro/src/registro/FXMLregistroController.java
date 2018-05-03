@@ -26,22 +26,31 @@ public class FXMLregistroController implements Initializable {
     
     @FXML
     private Button pbCensal;
-    
+
     public getRegistroData d;
     
     @FXML
     private void openCensal(ActionEvent event) {
         try {
             // Launch new window
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLid.fxml")); 
-            Parent r = (Parent) fxmlLoader.load();
+            FXMLLoader fxmlId; 
+            fxmlId = new FXMLLoader(getClass().getResource("FXMLid.fxml"));
+            Parent rId = (Parent) fxmlId.load();
+            
             Stage stage = new Stage(); 
             stage.initModality(Modality.APPLICATION_MODAL); 
-            stage.setTitle("Escoger identificador");
-            stage.setScene(new Scene(r));
-            FXMLidController controller = fxmlLoader.<FXMLidController>getController();
-            controller.SetData(this.d);
+            stage.setTitle("Escoger paciente");
+            stage.setScene(new Scene(rId));
+            
+            FXMLidController id = fxmlId.<FXMLidController>getController();
+            id.SetData(this.d);
+            
             stage.showAndWait();
+            
+            if (id.lContinue) {
+                System.out.println(id.lEdit);
+                System.out.println(id.id);
+            }
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
@@ -72,4 +81,5 @@ public class FXMLregistroController implements Initializable {
     public void SetData(getRegistroData data) {
         this.d = data;
     }    
+
 }
