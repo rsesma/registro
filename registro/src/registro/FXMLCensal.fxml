@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="582.0" prefWidth="552.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="registro.FXMLCensalController">
+   <children>
+      <Label layoutX="26.0" layoutY="27.0" text="Identificador" />
+      <TextField fx:id="id" layoutX="126.0" layoutY="23.0" prefHeight="25.0" prefWidth="58.0" />
+      <Label layoutX="209.0" layoutY="27.0" text="Número de la seguridad social" />
+      <TextField fx:id="nss" layoutX="385.0" layoutY="23.0" prefHeight="25.0" prefWidth="137.0" />
+      <Label layoutX="26.0" layoutY="66.0" text="Nombre" />
+      <TextField fx:id="nom" layoutX="126.0" layoutY="62.0" prefHeight="25.0" prefWidth="227.0" />
+      <Label layoutX="26.0" layoutY="99.0" text="Primer apellido" />
+      <TextField fx:id="ape1" layoutX="126.0" layoutY="95.0" prefHeight="25.0" prefWidth="398.0" />
+      <Label layoutX="26.0" layoutY="134.0" text="Segundo apellido" />
+      <TextField fx:id="ape2" layoutX="126.0" layoutY="130.0" prefHeight="25.0" prefWidth="398.0" />
+      <DatePicker fx:id="fentr" layoutX="126.0" layoutY="166.0" prefHeight="25.0" prefWidth="115.0" />
+      <Label layoutX="26.0" layoutY="170.0" text="Fecha entrada" />
+      <DatePicker fx:id="fnac" layoutX="409.0" layoutY="166.0" prefHeight="25.0" prefWidth="115.0" />
+      <Label layoutX="304.0" layoutY="170.0" text="Fecha nacimiento" />
+      <Label layoutX="26.0" layoutY="207.0" text="Sexo" />
+      <ComboBox fx:id="sexo" layoutX="126.0" layoutY="203.0" prefWidth="150.0" />
+      <Label layoutX="370.0" layoutY="207.0" text="Talla" />
+      <TextField fx:id="talla" layoutX="409.0" layoutY="203.0" prefHeight="25.0" prefWidth="58.0" />
+      <Label layoutX="480.0" layoutY="207.0" text="(metros)" />
+      <Label layoutX="26.0" layoutY="262.0" text="Domicilio" />
+      <TextField fx:id="domic" layoutX="126.0" layoutY="258.0" prefHeight="25.0" prefWidth="398.0" />
+      <Label layoutX="27.0" layoutY="297.0" text="Código Postal" />
+      <TextField fx:id="cp" layoutX="126.0" layoutY="293.0" prefHeight="25.0" prefWidth="58.0" />
+      <Label layoutX="207.0" layoutY="297.0" text="Población" />
+      <TextField fx:id="pobl" layoutX="269.0" layoutY="293.0" prefHeight="25.0" prefWidth="256.0" />
+      <Label layoutX="27.0" layoutY="332.0" text="Teléfono" />
+      <TextField fx:id="telef" layoutX="126.0" layoutY="328.0" prefHeight="25.0" prefWidth="58.0" />
+      <Label layoutX="207.0" layoutY="332.0" text="Profesión" />
+      <TextField fx:id="prof" layoutX="269.0" layoutY="328.0" prefHeight="25.0" prefWidth="256.0" />
+      <Label layoutX="27.0" layoutY="371.0" text="Notas" />
+      <TextArea layoutX="27.0" layoutY="394.0" prefHeight="121.0" prefWidth="497.0" />
+      <Button layoutX="462.0" layoutY="529.0" mnemonicParsing="false" onAction="#pbAceptar" text="Aceptar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button cancelButton="true" layoutX="385.0" layoutY="529.0" mnemonicParsing="false" onAction="#pbAceptar" text="Cancelar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button cancelButton="true" layoutX="25.0" layoutY="529.0" mnemonicParsing="false" onAction="#pbAceptar" text="Abrir Éxitus">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
