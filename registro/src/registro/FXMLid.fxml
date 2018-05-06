@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="370.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidController">
+<AnchorPane id="AnchorPane" prefHeight="399.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidController">
    <children>
       <Label layoutX="26.0" layoutY="14.0" text="Buscar:">
          <font>
@@ -32,9 +32,14 @@
          </children>
       </HBox>
       <Label fx:id="total" layoutX="26.0" layoutY="315.0" text="Label" />
-      <HBox layoutX="153.0" layoutY="318.0" spacing="5.0">
+      <HBox layoutX="80.0" layoutY="340.0" spacing="5.0">
          <children>
             <Button cancelButton="true" layoutX="207.0" layoutY="347.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            <Button layoutX="88.0" layoutY="10.0" mnemonicParsing="false" onAction="#deleteFired" prefHeight="30.0" text="Eliminar">
                <font>
                   <Font size="13.0" />
                </font>

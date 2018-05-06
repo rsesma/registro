@@ -13,7 +13,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -22,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import registro.model.Paciente;
 import registro.model.getRegistroData;
@@ -110,12 +114,23 @@ public class FXMLidController implements Initializable {
     @FXML
     private void editFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
+        if (p != null) {
+            id = p.getId();
+            lEdit = true;
+            lContinue = true;
+            closeWindow();
+        }
+    }
+
+    @FXML
+    private void deleteFired(ActionEvent event) {
+        Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
         id = p.getId();
         lEdit = true;
         lContinue = true;
         closeWindow();
     }
-
+    
     @FXML
     private void newFired(ActionEvent event) {
         lEdit = false;

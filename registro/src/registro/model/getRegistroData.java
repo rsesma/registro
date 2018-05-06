@@ -54,4 +54,8 @@ public class getRegistroData {
             return conn.prepareStatement("SELECT * FROM lista_id_nombre").executeQuery();
         }
     }
+
+    public ResultSet getCensalRs(String id) throws SQLException {
+        return conn.prepareStatement("SELECT * FROM Censal WHERE IDPAC = " + id).executeQuery();
+    }
 }
