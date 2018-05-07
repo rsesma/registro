@@ -55,7 +55,6 @@ public class FXMLidController implements Initializable {
     public Integer count;
     public getRegistroData d;
     public Boolean lContinue;
-    public Boolean lEdit;
     public String id;
     
     final ObservableList<Paciente> listaData = FXCollections.observableArrayList();
@@ -67,7 +66,6 @@ public class FXMLidController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         lContinue = false;
-        lEdit = false;
         id = "";
         
         // Set up the alumnos table
@@ -116,26 +114,52 @@ public class FXMLidController implements Initializable {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
         if (p != null) {
             id = p.getId();
-            lEdit = true;
             lContinue = true;
-            closeWindow();
+            
+            try {
+                FXMLLoader fxmlCensal;
+                fxmlCensal = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
+                Parent rCensal = (Parent) fxmlCensal.load(); 
+
+                Stage stage = new Stage(); 
+                stage.initModality(Modality.APPLICATION_MODAL); 
+                stage.setTitle("Censal");
+                stage.setScene(new Scene(rCensal));
+
+                FXMLCensalController censal = fxmlCensal.<FXMLCensalController>getController();
+                censal.SetData(id, true, d);
+
+                stage.showAndWait();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     @FXML
     private void deleteFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
-        id = p.getId();
-        lEdit = true;
-        lContinue = true;
-        closeWindow();
     }
     
     @FXML
     private void newFired(ActionEvent event) {
-        lEdit = false;
-        lContinue = true;
-        closeWindow();
+        try {
+            FXMLLoader fxmlCensal;
+            fxmlCensal = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
+            Parent rCensal = (Parent) fxmlCensal.load(); 
+
+            Stage stage = new Stage(); 
+            stage.initModality(Modality.APPLICATION_MODAL); 
+            stage.setTitle("Censal");
+            stage.setScene(new Scene(rCensal));
+
+            FXMLCensalController censal = fxmlCensal.<FXMLCensalController>getController();
+            censal.SetData("", false, d);
+
+            stage.showAndWait();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void LoadTable(String filter) {
@@ -165,8 +189,7 @@ public class FXMLidController implements Initializable {
     }
     
     private void closeWindow() {
-        // close window
-        Stage stage = (Stage) pbSearch.getScene().getWindow();
+        Stage stage = (Stage) this.pbSearch.getScene().getWindow();
         stage.close();
     }    
 }

@@ -46,20 +46,6 @@ public class FXMLregistroController implements Initializable {
             id.SetData(this.d);
             
             stage.showAndWait();
-            
-            if (id.lContinue) {
-                FXMLLoader fxmlCensal;
-                fxmlCensal = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
-                Parent rCensal = (Parent) fxmlCensal.load(); 
-
-                stage.setTitle("Censal");
-                stage.setScene(new Scene(rCensal));
-
-                FXMLCensalController censal = fxmlCensal.<FXMLCensalController>getController();
-                censal.SetData(id.id, id.lEdit, d);
-
-                stage.showAndWait();
-            }
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }

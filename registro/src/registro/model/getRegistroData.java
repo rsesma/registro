@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 import javafx.scene.control.Alert;
 
 /**
@@ -57,5 +59,23 @@ public class getRegistroData {
 
     public ResultSet getCensalRs(String id) throws SQLException {
         return conn.prepareStatement("SELECT * FROM Censal WHERE IDPAC = " + id).executeQuery();
+    }
+
+    public Boolean updateCensal(String id, List<CensalCollection> list) {
+        Boolean lOk = false;
+        
+        StringBuilder b = new StringBuilder();
+        b.append("UPDATE Censal \nSET \n");
+        for(CensalCollection c : list){
+            if (c.type == CtrlType.TXT) {
+                b.append("  " + c.field + " = '" + c.oTxt.getText() + "', \n");
+            }
+        }
+        String c = b.toString();
+        c = c.substring(0,c.length()-3) + "\n";
+        c = c.concat("WHERE IDPAC = " + id + ";");
+        System.out.println(c);
+
+        return lOk;
     }
 }
