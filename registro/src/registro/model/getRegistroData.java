@@ -6,10 +6,10 @@
 package registro.model;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import javafx.scene.control.Alert;
 
@@ -62,20 +62,51 @@ public class getRegistroData {
     }
 
     public Boolean updateCensal(String id, List<CensalCollection> list) {
-        Boolean lOk = false;
-        
         StringBuilder b = new StringBuilder();
         b.append("UPDATE Censal \nSET \n");
         for(CensalCollection c : list){
-            if (c.type == CtrlType.TXT) {
-                b.append("  " + c.field + " = '" + c.oTxt.getText() + "', \n");
+            switch (c.type) {
+                case TXT:
+                    if (c.oTxt.getText().isEmpty()) {
+                        b.append("  ").append(c.field).append(" = NULL, \n");
+                    } else {
+                        if (c.field.equalsIgnoreCase("IDPAC") || c.field.equalsIgnoreCase("TALLA")) {
+                            b.append("  ").append(c.field).append(" = ").append(c.oTxt.getText()).append(", \n");
+                        } else {
+                            b.append("  ").append(c.field).append(" = '").append(c.oTxt.getText()).append("', \n");
+                        }
+                    }
+                    break;
+                case MEMO:
+                    if (c.oMemo.getText() == null) {
+                        b.append("  ").append(c.field).append(" = NULL, \n");
+                    } else {
+                        b.append("  ").append(c.field).append(" = '").append(c.oMemo.getText()).append("', \n");
+                    }
+                    break;
+                case DATE:
+                    if (c.oDate.getValue() == null) {
+                        b.append("  ").append(c.field).append(" = NULL, \n");
+                    } else {
+                        Date date = Date.valueOf(c.oDate.getValue());
+                        b.append("  ").append(c.field).append(" = '").append(date.toString()).append("', \n");
+                    }
+                    break;
+                case RB:
+                    if (c.oRB.isSelected()) b.append("  ").append(c.field).append(" = '").append(c.value).append("', \n");
+                    break;
             }
         }
-        String c = b.toString();
-        c = c.substring(0,c.length()-3) + "\n";
-        c = c.concat("WHERE IDPAC = " + id + ";");
-        System.out.println(c);
-
-        return lOk;
+        String sql = b.toString();
+        sql = sql.substring(0,sql.length()-3).concat("\n").concat("WHERE IDPAC = ").concat(id).concat(";");
+        
+        try {
+            conn.prepareStatement(sql).executeUpdate();
+            return true;
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return false;
+        }
     }
 }

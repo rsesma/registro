@@ -8,6 +8,7 @@ package registro;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -130,6 +131,21 @@ public class FXMLidController implements Initializable {
                 censal.SetData(id, true, d);
 
                 stage.showAndWait();
+                
+                if (censal.changed) {
+                    ResultSet rs = d.getListaIdRs("IDPAC = ".concat(censal.updatedID));
+                    if (rs.next()){
+                        Paciente edited = new Paciente();
+                        edited.id.set(rs.getString("IDPAC"));
+                        edited.nom.set(rs.getString("NOMBRE"));
+                        
+                        // remove old selected item and add edited one
+                        this.listaData.remove(p);
+                        this.listaData.add(edited);
+                        
+                        SortAndSelect(edited);
+                    }
+                }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -182,6 +198,21 @@ public class FXMLidController implements Initializable {
             System.out.println(e.getMessage());
         }
     }
+    
+    public void SortAndSelect(Paciente item) {
+        // sort list and select item
+        Comparator<Paciente> comparator = Comparator.comparing(Paciente::getId); 
+        FXCollections.sort(listaData, comparator);
+
+        if (item != null) {
+            table.getSelectionModel().select(item);
+            table.scrollTo(item);
+        } else {
+            table.getSelectionModel().selectFirst();
+            table.scrollTo(1);
+        }
+    }
+
     
     public void SetData(getRegistroData data) {
         this.d = data;

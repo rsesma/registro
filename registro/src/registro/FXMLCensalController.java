@@ -11,6 +11,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
@@ -68,6 +70,8 @@ public class FXMLCensalController implements Initializable {
 
     public String identifier;
     public Boolean edit;
+    public Boolean changed;
+    public String updatedID;
     
     public getRegistroData d;
     
@@ -81,6 +85,8 @@ public class FXMLCensalController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        this.changed = false;
+        
         this.list.add(new CensalCollection("IDPAC", CtrlType.TXT, this.id,""));
         this.list.add(new CensalCollection("NSS", CtrlType.TXT, this.nss,""));
         this.list.add(new CensalCollection("NOMBRE", CtrlType.TXT, this.nom,""));
@@ -186,37 +192,23 @@ public class FXMLCensalController implements Initializable {
     @FXML
     void pbAceptar(ActionEvent event) {
         if (this.edit) {
-            this.d.updateCensal(this.identifier, this.list);
-/*            try {
-                ResultSet rs = this.d.getCensalRs(this.identifier);
-                if (rs.next()) {
-                    rs.updateString("NOMBRE",this.nom.getText());
-                    rs.updateRow();
-                    this.d.exeCommit();*/
-                    
-/*                    for(CensalCollection c : list){
-                        switch (c.type) {
-                            case TXT:
-                                c.oTxt.setText(rs.getString(c.field));
-                                break;
-                            case MEMO:
-                                c.oMemo.setText(rs.getString(c.field));
-                                break;
-                            case DATE:
-                                java.sql.Date fecha = rs.getDate(c.field);
-                                c.oDate.setValue(fecha.toLocalDate());
-                                break;
-                            case RB:
-                                String v = rs.getString(c.field);
-                                if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
-                                break;
-                        }
-                    }
+            Boolean lok = true;
+            if (!this.id.getText().equalsIgnoreCase(this.identifier)) {
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se aplicarán los cambios en todos los registros relacionados.\n\n ¿Desea continuar?");
+                confirm.setTitle("Confirmar");
+                confirm.setHeaderText("Ha cambiado el identificador");
+                Optional<ButtonType> result = confirm.showAndWait();
+                lok = (result.get() == ButtonType.YES);
+            }
+            
+            if (lok){
+                if (this.d.updateCensal(this.identifier, this.list)) {
+                    this.changed = true;
+                    this.updatedID = this.id.getText();
+
+                    closeWindow();
                 }
-            } catch (Exception e) {
-                Alert alert = new Alert(AlertType.ERROR, e.getMessage());
-                alert.showAndWait();
-            }*/
+            }
         }
     }
 
