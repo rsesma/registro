@@ -32,29 +32,25 @@
          </children>
       </HBox>
       <Label fx:id="total" layoutX="26.0" layoutY="315.0" text="Label" />
-      <HBox layoutX="72.0" layoutY="340.0" spacing="5.0">
-         <children>
-            <Button cancelButton="true" layoutX="207.0" layoutY="347.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-            <Button layoutX="88.0" layoutY="10.0" mnemonicParsing="false" onAction="#deleteFired" prefHeight="30.0" text="Eliminar">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-            <Button mnemonicParsing="false" onAction="#newFired" prefHeight="30.0" text="Nuevo">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-            <Button layoutX="277.0" layoutY="347.0" mnemonicParsing="false" onAction="#editFired" prefHeight="30.0" text="Editar">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
+      <Button cancelButton="true" layoutX="37.0" layoutY="342.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button fx:id="btDelete" layoutX="119.0" layoutY="342.0" mnemonicParsing="false" onAction="#deleteFired" prefHeight="30.0" text="Eliminar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button fx:id="btNew" layoutX="196.0" layoutY="342.0" mnemonicParsing="false" onAction="#newFired" prefHeight="30.0" text="Nuevo">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button fx:id="btContinue" layoutX="264.0" layoutY="342.0" mnemonicParsing="false" onAction="#editFired" prefHeight="30.0" text="Editar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

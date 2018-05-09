@@ -31,6 +31,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import registro.FXMLregistroController.Forms;
 import registro.model.Paciente;
 import registro.model.getRegistroData;
 
@@ -55,11 +56,18 @@ public class FXMLidController implements Initializable {
     private TableColumn idCol;
     @FXML
     private TableColumn nomCol;
+    @FXML
+    private Button btContinue;
+    @FXML
+    private Button btNew;
+    @FXML
+    private Button btDelete;
     
     public Integer count;
     public getRegistroData d;
     public Boolean lContinue;
     public String id;
+    public Forms form;
     
     final ObservableList<Paciente> listaData = FXCollections.observableArrayList();
 
@@ -116,38 +124,57 @@ public class FXMLidController implements Initializable {
     @FXML
     private void editFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
+
         if (p != null) {
-            id = p.getId();
-            lContinue = true;
-            
             try {
-                FXMLLoader fxmlCensal;
-                fxmlCensal = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
-                Parent rCensal = (Parent) fxmlCensal.load(); 
+                id = p.getId();
+                lContinue = true;
 
-                Stage stage = new Stage(); 
+                Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL); 
-                stage.setTitle("Censal");
-                stage.setScene(new Scene(rCensal));
+                FXMLLoader fxml;
 
-                FXMLCensalController censal = fxmlCensal.<FXMLCensalController>getController();
-                censal.SetData(id, true, d);
+                switch (this.form) {
+                    case CENSAL:
+                        fxml = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
+                        Parent rCensal = (Parent) fxml.load(); 
 
-                stage.showAndWait();
-                
-                if (censal.changed) {
-                    ResultSet rs = d.getListaIdRs("IDPAC = ".concat(censal.updatedID));
-                    if (rs.next()){
-                        Paciente edited = new Paciente();
-                        edited.id.set(rs.getString("IDPAC"));
-                        edited.nom.set(rs.getString("NOMBRE"));
-                        
-                        // remove old selected item and add edited one
-                        this.listaData.remove(p);
-                        this.listaData.add(edited);
-                        
-                        SortAndSelect(edited);
-                    }
+                        stage.setTitle("Censal");
+                        stage.setScene(new Scene(rCensal));
+
+                        FXMLCensalController censal = fxml.<FXMLCensalController>getController();
+                        censal.SetData(id, true, d);
+
+                        stage.showAndWait();
+
+                        if (censal.changed) {
+                            ResultSet rs = d.getListaIdRs("IDPAC = ".concat(censal.updatedID));
+                            if (rs.next()){
+                                Paciente edited = new Paciente();
+                                edited.id.set(rs.getString("IDPAC"));
+                                edited.nom.set(rs.getString("NOMBRE"));
+
+                                // remove old selected item and add edited one
+                                this.listaData.remove(p);
+                                this.listaData.add(edited);
+
+                                SortAndSelect(edited);
+                            }
+                        }
+
+                        break;            
+                    case VISITAS:
+                        fxml = new FXMLLoader(getClass().getResource("FXMLfecha.fxml")); 
+                        Parent rFecha = (Parent) fxml.load();
+
+                        stage.setTitle("Escoger visita");
+                        stage.setScene(new Scene(rFecha));
+
+                        FXMLfechaController fecha = fxml.<FXMLfechaController>getController();
+                        fecha.SetData(p, d, Forms.VISITAS);
+
+                        stage.showAndWait();
+                        break;
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -245,11 +272,25 @@ public class FXMLidController implements Initializable {
             table.scrollTo(1);
         }
     }
-
     
-    public void SetData(getRegistroData data) {
+    public void SetData(getRegistroData data, Forms f) {
         this.d = data;
+        this.form = f;
+        
         LoadTable("");
+        
+        switch (this.form) {
+            case CENSAL:
+                this.btContinue.setText("Editar");
+                this.btNew.setVisible(true);
+                this.btDelete.setVisible(true);
+                break;            
+            case VISITAS:
+                this.btContinue.setText("Continuar");
+                this.btNew.setVisible(false);
+                this.btDelete.setVisible(false);
+                break;
+        }
     }
     
     private void closeWindow() {

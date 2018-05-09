@@ -60,7 +60,7 @@ public class getRegistroData {
     public ResultSet getCensalRs(String id) throws SQLException {
         return conn.prepareStatement("SELECT * FROM Censal WHERE IDPAC = " + id).executeQuery();
     }
-
+    
     public Boolean CensalIdExists(String id) {
         try {
             ResultSet rs = conn.prepareStatement("SELECT COUNT(IDPAC) AS N FROM Censal WHERE IDPAC = ".concat(id)).executeQuery();
@@ -187,5 +187,10 @@ public class getRegistroData {
             return false;            
         }
     }
+    
+    public ResultSet getVisitasById(String id) throws SQLException {
+        return conn.prepareStatement("SELECT FECHA FROM Visitas WHERE IDPACV = ".concat(id)).executeQuery();
+    }
+
 
 }

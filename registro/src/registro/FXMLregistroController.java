@@ -43,7 +43,7 @@ public class FXMLregistroController implements Initializable {
             stage.setScene(new Scene(rId));
             
             FXMLidController id = fxmlId.<FXMLidController>getController();
-            id.SetData(this.d);
+            id.SetData(this.d,Forms.CENSAL);
             
             stage.showAndWait();
         } catch(Exception e) {
@@ -53,7 +53,24 @@ public class FXMLregistroController implements Initializable {
 
     @FXML
     private void openVisitas(ActionEvent event) {
-        //System.out.println("You clicked me!");
+        try {
+            // Launch new window
+            FXMLLoader fxmlId; 
+            fxmlId = new FXMLLoader(getClass().getResource("FXMLid.fxml"));
+            Parent rId = (Parent) fxmlId.load();
+            
+            Stage stage = new Stage(); 
+            stage.initModality(Modality.APPLICATION_MODAL); 
+            stage.setTitle("Escoger paciente");
+            stage.setScene(new Scene(rId));
+            
+            FXMLidController id = fxmlId.<FXMLidController>getController();
+            id.SetData(this.d,Forms.VISITAS);
+            
+            stage.showAndWait();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @FXML
@@ -77,4 +94,7 @@ public class FXMLregistroController implements Initializable {
         this.d = data;
     }    
 
+    public enum Forms {
+        CENSAL, VISITAS, EVENTOS
+    }
 }
