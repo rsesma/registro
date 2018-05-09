@@ -61,6 +61,20 @@ public class getRegistroData {
         return conn.prepareStatement("SELECT * FROM Censal WHERE IDPAC = " + id).executeQuery();
     }
 
+    public Boolean CensalIdExists(String id) {
+        try {
+            ResultSet rs = conn.prepareStatement("SELECT COUNT(IDPAC) AS N FROM Censal WHERE IDPAC = ".concat(id)).executeQuery();
+            rs.next();
+            Integer count = rs.getInt("N");
+            rs.close();
+            return (count>0);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return true;
+        }
+    }
+    
     public Boolean updateCensal(String id, List<CensalCollection> list) {
         StringBuilder b = new StringBuilder();
         b.append("UPDATE Censal \nSET \n");
@@ -109,4 +123,69 @@ public class getRegistroData {
             return false;
         }
     }
+    
+    public Boolean addCensal(List<CensalCollection> list) {
+        StringBuilder f = new StringBuilder();
+        StringBuilder v = new StringBuilder();
+        String SexoVal = "";
+        for(CensalCollection c : list){
+            if (c.type!= CtrlType.RB) f.append(c.field).append(",");
+            switch (c.type) {
+                case TXT:
+                    if (c.oTxt.getText().isEmpty()) {
+                        v.append("NULL").append(",");
+                    } else {
+                        if (c.field.equalsIgnoreCase("IDPAC") || c.field.equalsIgnoreCase("TALLA")) {
+                            v.append(c.oTxt.getText()).append(",");
+                        } else {
+                            v.append("'").append(c.oTxt.getText()).append("',");
+                        }
+                    }
+                    break;
+                case MEMO:
+                    if (c.oMemo.getText() == null) {
+                        v.append("NULL").append(",");
+                    } else {
+                        v.append("'").append(c.oMemo.getText()).append("',");
+                    }
+                    break;
+                case DATE:
+                    if (c.oDate.getValue() == null) {
+                        v.append("NULL,");
+                    } else {
+                        Date date = Date.valueOf(c.oDate.getValue());
+                        v.append("'").append(date.toString()).append("',");
+                    }
+                    break;
+                case RB:
+                    if (c.oRB.isSelected()) SexoVal = c.value;
+                    break;
+            }
+        }
+        String fields = f.toString().concat("SEXO");
+        String values = v.toString().concat("'" + SexoVal + "'");
+        String sql = "INSERT INTO Censal\n  (".concat(fields).concat(") \n");
+        sql = sql.concat("  VALUES(").concat(values).concat(");");
+        
+        try {
+            conn.prepareStatement(sql).executeUpdate();
+            return true;
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return false;
+        }
+    }
+    
+    public Boolean deleteCensalbyID(String id) {
+        try {
+            conn.prepareStatement("DELETE FROM Censal WHERE IDPAC = ".concat(id)).execute();
+            return true;
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return false;            
+        }
+    }
+
 }

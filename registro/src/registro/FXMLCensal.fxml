@@ -56,7 +56,7 @@
             <Font size="13.0" />
          </font>
       </Button>
-      <Button cancelButton="true" layoutX="22.0" layoutY="534.0" mnemonicParsing="false" onAction="#pbExitus" text="Abrir Éxitus">
+      <Button fx:id="btExit" cancelButton="true" layoutX="22.0" layoutY="534.0" mnemonicParsing="false" onAction="#pbExitus" text="Abrir Éxitus">
          <font>
             <Font size="13.0" />
          </font>

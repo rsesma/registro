@@ -32,7 +32,7 @@
          </children>
       </HBox>
       <Label fx:id="total" layoutX="26.0" layoutY="315.0" text="Label" />
-      <HBox layoutX="80.0" layoutY="340.0" spacing="5.0">
+      <HBox layoutX="72.0" layoutY="340.0" spacing="5.0">
          <children>
             <Button cancelButton="true" layoutX="207.0" layoutY="347.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
                <font>

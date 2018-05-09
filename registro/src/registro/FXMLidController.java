@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,7 +19,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -155,6 +158,23 @@ public class FXMLidController implements Initializable {
     @FXML
     private void deleteFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
+        if (p != null) {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará el paciente seleccionado y todos los registros relacionados.\n\n ¿Desea continuar?");
+            confirm.setTitle("Eliminar");
+            confirm.setHeaderText("Confirmar eliminación");
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                try {
+                    if (this.d.deleteCensalbyID(p.getId())) {
+                        listaData.remove(p);
+                        count--;
+                        total.setText(count + " paciente(s)");
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }               
+            }
+        }
     }
     
     @FXML
@@ -173,6 +193,19 @@ public class FXMLidController implements Initializable {
             censal.SetData("", false, d);
 
             stage.showAndWait();
+            
+            if (censal.changed) {
+                ResultSet rs = d.getListaIdRs("IDPAC = ".concat(censal.updatedID));
+                if (rs.next()){
+                    Paciente edited = new Paciente();
+                    edited.id.set(rs.getString("IDPAC"));
+                    edited.nom.set(rs.getString("NOMBRE"));
+
+                    // add new item
+                    this.listaData.add(edited);
+                    SortAndSelect(edited);
+                }
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

@@ -20,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.DatePicker;
@@ -67,6 +68,8 @@ public class FXMLCensalController implements Initializable {
     private RadioButton fem;
     @FXML
     private TextArea notes;
+    @FXML
+    private Button btExit;
 
     public String identifier;
     public Boolean edit;
@@ -160,29 +163,45 @@ public class FXMLCensalController implements Initializable {
         
         try {
             if (this.edit) {
+                this.btExit.setDisable(false);
+                
+                String v;
                 ResultSet rs = this.d.getCensalRs(idPac);
                 if (rs.next()) {
                     this.identifier = idPac;
                     for(CensalCollection c : list){
                         switch (c.type) {
                             case TXT:
-                                c.oTxt.setText(rs.getString(c.field));
+                                v = rs.getString(c.field);
+                                if (!rs.wasNull()) {
+                                    c.oTxt.setText(v); 
+                                }
                                 break;
                             case MEMO:
-                                c.oMemo.setText(rs.getString(c.field));
+                                v = rs.getString(c.field);
+                                if (!rs.wasNull()) {
+                                    c.oMemo.setText(v);
+                                }
                                 break;
                             case DATE:
                                 java.sql.Date fecha = rs.getDate(c.field);
-                                c.oDate.setValue(fecha.toLocalDate());
+                                if (!rs.wasNull()) {
+                                    c.oDate.setValue(fecha.toLocalDate());
+                                }
                                 break;
                             case RB:
-                                String v = rs.getString(c.field);
-                                if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
+                                v = rs.getString(c.field);
+                                if (!rs.wasNull()) {
+                                    if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
+                                }
                                 break;
                         }
                     }
                 }
                 rs.close();
+            }
+            else {
+                this.btExit.setDisable(true);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -191,21 +210,37 @@ public class FXMLCensalController implements Initializable {
     
     @FXML
     void pbAceptar(ActionEvent event) {
-        if (this.edit) {
-            Boolean lok = true;
-            if (!this.id.getText().equalsIgnoreCase(this.identifier)) {
-                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se aplicarán los cambios en todos los registros relacionados.\n\n ¿Desea continuar?");
-                confirm.setTitle("Confirmar");
-                confirm.setHeaderText("Ha cambiado el identificador");
-                Optional<ButtonType> result = confirm.showAndWait();
-                lok = (result.get() == ButtonType.YES);
-            }
-            
-            if (lok){
-                if (this.d.updateCensal(this.identifier, this.list)) {
+        
+        if (this.id.getText().isEmpty()) {
+            Alert error = new Alert(Alert.AlertType.ERROR, "El identificador de paciente no puede quedar vacío.");
+            error.setTitle("Error");
+            error.setHeaderText("Identificador vacío");
+            error.showAndWait();
+        } else {
+            if (this.d.CensalIdExists(this.id.getText())) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "El identificador de paciente ya existe.");
+                alert.setTitle("Atención");
+                alert.setHeaderText("Identificador duplicado");
+                alert.showAndWait();
+            } else {
+                Boolean ok = true;
+                if (this.edit) {
+                    if (!this.id.getText().equalsIgnoreCase(this.identifier)) {
+                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se aplicarán los cambios en todos los registros relacionados.\n\n ¿Desea continuar?");
+                        confirm.setTitle("Confirmar");
+                        confirm.setHeaderText("Ha cambiado el identificador");
+                        Optional<ButtonType> result = confirm.showAndWait();
+                        ok = (result.get() == ButtonType.OK);
+                    }
+
+                    if (ok) ok = this.d.updateCensal(this.identifier, this.list);
+                } else {
+                    ok = this.d.addCensal(this.list);
+                }
+                
+                if (ok) {
                     this.changed = true;
                     this.updatedID = this.id.getText();
-
                     closeWindow();
                 }
             }
