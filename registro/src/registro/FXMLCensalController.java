@@ -6,7 +6,7 @@
 package registro;
 
 import registro.model.CtrlType;
-import registro.model.CensalCollection;
+import registro.model.CtrlCollection;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.util.LinkedList;
@@ -78,7 +78,7 @@ public class FXMLCensalController implements Initializable {
     
     public getRegistroData d;
     
-    public List<CensalCollection> list = new LinkedList<>();
+    public List<CtrlCollection> list = new LinkedList<>();
     
     /**
      * Initializes the controller class.
@@ -90,17 +90,17 @@ public class FXMLCensalController implements Initializable {
         // TODO
         this.changed = false;
         
-        this.list.add(new CensalCollection("IDPAC", CtrlType.TXT, this.id,""));
-        this.list.add(new CensalCollection("NSS", CtrlType.TXT, this.nss,""));
-        this.list.add(new CensalCollection("NOMBRE", CtrlType.TXT, this.nom,""));
-        this.list.add(new CensalCollection("APE1", CtrlType.TXT, this.ape1,""));
-        this.list.add(new CensalCollection("APE2", CtrlType.TXT, this.ape2,""));
-        this.list.add(new CensalCollection("DOMIC", CtrlType.TXT, this.domic,""));
-        this.list.add(new CensalCollection("POBL", CtrlType.TXT, this.pobl,""));
-        this.list.add(new CensalCollection("PROF", CtrlType.TXT, this.prof,""));
+        this.list.add(new CtrlCollection("IDPAC", CtrlType.TXT, this.id,""));
+        this.list.add(new CtrlCollection("NSS", CtrlType.TXT, this.nss,""));
+        this.list.add(new CtrlCollection("NOMBRE", CtrlType.TXT, this.nom,""));
+        this.list.add(new CtrlCollection("APE1", CtrlType.TXT, this.ape1,""));
+        this.list.add(new CtrlCollection("APE2", CtrlType.TXT, this.ape2,""));
+        this.list.add(new CtrlCollection("DOMIC", CtrlType.TXT, this.domic,""));
+        this.list.add(new CtrlCollection("POBL", CtrlType.TXT, this.pobl,""));
+        this.list.add(new CtrlCollection("PROF", CtrlType.TXT, this.prof,""));
         
         this.cp.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation(5,false));
-        this.list.add(new CensalCollection("CPOST", CtrlType.TXT, this.cp,""));
+        this.list.add(new CtrlCollection("CPOST", CtrlType.TXT, this.cp,""));
         
         this.talla.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation(4,true));
         this.talla.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -116,18 +116,18 @@ public class FXMLCensalController implements Initializable {
                 }
             }
         });
-        this.list.add(new CensalCollection("TALLA", CtrlType.TXT, this.talla,""));
+        this.list.add(new CtrlCollection("TALLA", CtrlType.TXT, this.talla,""));
         
         this.telef.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation(9,false));
-        this.list.add(new CensalCollection("TEL", CtrlType.TXT, this.telef,""));
+        this.list.add(new CtrlCollection("TEL", CtrlType.TXT, this.telef,""));
         
-        this.list.add(new CensalCollection("FNAC", CtrlType.DATE, this.fnac,""));
-        this.list.add(new CensalCollection("FENTR", CtrlType.DATE, this.fentr,""));
+        this.list.add(new CtrlCollection("FNAC", CtrlType.DATE, this.fnac,""));
+        this.list.add(new CtrlCollection("FENTR", CtrlType.DATE, this.fentr,""));
         
-        this.list.add(new CensalCollection("SEXO", CtrlType.RB, this.fem,"F"));
-        this.list.add(new CensalCollection("SEXO", CtrlType.RB, this.masc,"M"));
+        this.list.add(new CtrlCollection("SEXO", CtrlType.RB, this.fem,"F"));
+        this.list.add(new CtrlCollection("SEXO", CtrlType.RB, this.masc,"M"));
         
-        this.list.add(new CensalCollection("NOTAS", CtrlType.MEMO, this.notes,""));
+        this.list.add(new CtrlCollection("NOTAS", CtrlType.MEMO, this.notes,""));
     }
 
     public EventHandler<KeyEvent> numeric_Validation(final Integer max_Lengh, final Boolean dec) {
@@ -169,7 +169,7 @@ public class FXMLCensalController implements Initializable {
                 ResultSet rs = this.d.getCensalRs(idPac);
                 if (rs.next()) {
                     this.identifier = idPac;
-                    for(CensalCollection c : list){
+                    for(CtrlCollection c : list){
                         switch (c.type) {
                             case TXT:
                                 v = rs.getString(c.field);

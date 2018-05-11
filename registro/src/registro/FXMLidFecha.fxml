@@ -31,7 +31,7 @@
             <Button fx:id="pbNoFilter" ellipsisString="" layoutX="305.0" layoutY="35.0" mnemonicParsing="false" onAction="#noFilterFired" prefHeight="25.0" prefWidth="25.0" textAlignment="CENTER" />
          </children>
       </HBox>
-      <Label fx:id="total" layoutX="26.0" layoutY="244.0" prefHeight="17.0" prefWidth="313.0" text="Label" textAlignment="RIGHT" />
+      <Label fx:id="total" alignment="BOTTOM_RIGHT" layoutX="26.0" layoutY="244.0" prefHeight="17.0" prefWidth="313.0" text="Label" textAlignment="RIGHT" />
       <Label fx:id="txFecha" layoutX="26.0" layoutY="270.0" text="Label">
          <font>
             <Font size="13.0" />

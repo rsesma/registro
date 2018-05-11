@@ -17,6 +17,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -140,20 +142,23 @@ public class FXMLidFechaController implements Initializable {
                 stage.initModality(Modality.APPLICATION_MODAL); 
                 FXMLLoader fxml;
 
-                switch (this.form) {
-                    case VISITAS:
-/*                        fxml = new FXMLLoader(getClass().getResource("FXMLVisitas.fxml")); 
-                        Parent rVisitas = (Parent) fxml.load(); 
-                        stage.setTitle("Visitas");
-                        stage.setScene(new Scene(rVisitas));
-                        FXMLVisitasController visitas = fxml.<FXMLVisitasController>getController();
-                        visitas.SetData(p.getId(), f, true, d);
-                        
-                        stage.showAndWait();
-*/                        
-                        break;
-                }
+                try {
+                    switch (this.form) {
+                        case VISITAS:
+                            fxml = new FXMLLoader(getClass().getResource("FXMLVisitas.fxml")); 
+                            Parent rVisitas = (Parent) fxml.load(); 
+                            stage.setTitle("Visitas");
+                            stage.setScene(new Scene(rVisitas));
+                            FXMLVisitasController visitas = fxml.<FXMLVisitasController>getController();
+                            visitas.SetData(p.getId(), f, true, d);
 
+                            stage.showAndWait();
+
+                            break;
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             } else {
                 Alert wf = new Alert(Alert.AlertType.WARNING, "Seleccione una visita");
                 wf.setTitle("Seleccionar");

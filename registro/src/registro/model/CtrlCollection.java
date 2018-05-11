@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
  * @author r
  */
 
-public class CensalCollection implements java.io.Serializable {
+public class CtrlCollection implements java.io.Serializable {
     public String field;
     public String value;
     public CtrlType type;
@@ -27,7 +27,7 @@ public class CensalCollection implements java.io.Serializable {
     public RadioButton oRB;
     public TextArea oMemo;
     
-    public CensalCollection(String name, CtrlType t, Object o, String val){
+    public CtrlCollection(String name, CtrlType t, Object o, String val){
         this.field = name;
         this.type = t;
         

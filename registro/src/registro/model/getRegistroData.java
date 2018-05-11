@@ -8,6 +8,7 @@ package registro.model;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -76,10 +77,10 @@ public class getRegistroData {
         }
     }
     
-    public Boolean updateCensal(String id, List<CensalCollection> list) {
+    public Boolean updateCensal(String id, List<CtrlCollection> list) {
         StringBuilder b = new StringBuilder();
         b.append("UPDATE Censal \nSET \n");
-        for(CensalCollection c : list){
+        for(CtrlCollection c : list){
             switch (c.type) {
                 case TXT:
                     if (c.oTxt.getText().isEmpty()) {
@@ -125,11 +126,11 @@ public class getRegistroData {
         }
     }
     
-    public Boolean addCensal(List<CensalCollection> list) {
+    public Boolean addCensal(List<CtrlCollection> list) {
         StringBuilder f = new StringBuilder();
         StringBuilder v = new StringBuilder();
         String SexoVal = "";
-        for(CensalCollection c : list){
+        for(CtrlCollection c : list){
             if (c.type!= CtrlType.RB) f.append(c.field).append(",");
             switch (c.type) {
                 case TXT:
@@ -195,5 +196,12 @@ public class getRegistroData {
         } else {
             return null;
         }
+    }
+    
+    public ResultSet getVisitasByIdFecha(String id, Date fecha) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM CVisitas WHERE IDPACV = ? AND FECHA = ?");
+        q.setString(1, id);
+        q.setDate(2, fecha);
+        return q.executeQuery();
     }
 }
