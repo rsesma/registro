@@ -23,10 +23,11 @@ public class Registro extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
+        Boolean test = true;
         Boolean lContinue = true;
 
         // Launch login window
-        if (false) {
+        if (!test) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLlogin.fxml")); 
             Parent r2 = (Parent) fxmlLoader.load(); 
             Stage stage0 = new Stage(); 

@@ -43,7 +43,7 @@ public class FXMLregistroController implements Initializable {
             stage.setScene(new Scene(rId));
             
             FXMLidController id = fxmlId.<FXMLidController>getController();
-            id.SetData(this.d,Forms.CENSAL);
+            id.SetData(this.d);
             
             stage.showAndWait();
         } catch(Exception e) {
@@ -55,17 +55,17 @@ public class FXMLregistroController implements Initializable {
     private void openVisitas(ActionEvent event) {
         try {
             // Launch new window
-            FXMLLoader fxmlId; 
-            fxmlId = new FXMLLoader(getClass().getResource("FXMLid.fxml"));
-            Parent rId = (Parent) fxmlId.load();
+            FXMLLoader fxml; 
+            fxml = new FXMLLoader(getClass().getResource("FXMLidFecha.fxml"));
+            Parent rIdFecha = (Parent) fxml.load();
             
             Stage stage = new Stage(); 
             stage.initModality(Modality.APPLICATION_MODAL); 
-            stage.setTitle("Escoger paciente");
-            stage.setScene(new Scene(rId));
+            stage.setTitle("Escoger visita");
+            stage.setScene(new Scene(rIdFecha));
             
-            FXMLidController id = fxmlId.<FXMLidController>getController();
-            id.SetData(this.d,Forms.VISITAS);
+            FXMLidFechaController idFecha = fxml.<FXMLidFechaController>getController();
+            idFecha.SetData(this.d,Forms.VISITAS);
             
             stage.showAndWait();
         } catch(Exception e) {

@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import javafx.scene.control.Alert;
+import registro.FXMLregistroController.Forms;
 
 /**
  *
@@ -188,9 +189,11 @@ public class getRegistroData {
         }
     }
     
-    public ResultSet getVisitasById(String id) throws SQLException {
-        return conn.prepareStatement("SELECT FECHA FROM Visitas WHERE IDPACV = ".concat(id)).executeQuery();
+    public ResultSet getFechasById(String id, Forms type) throws SQLException {
+        if (type == Forms.VISITAS) {
+            return conn.prepareStatement("SELECT FECHA FROM Visitas WHERE IDPACV = ".concat(id)).executeQuery();
+        } else {
+            return null;
+        }
     }
-
-
 }

@@ -6,10 +6,10 @@
 package registro;
 
 import java.net.URL;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,11 +17,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,7 +38,7 @@ import registro.model.getRegistroData;
  *
  * @author R
  */
-public class FXMLidController implements Initializable {
+public class FXMLidFechaController implements Initializable {
 
     @FXML
     private TextField search;
@@ -56,9 +54,14 @@ public class FXMLidController implements Initializable {
     private TableColumn idCol;
     @FXML
     private TableColumn nomCol;
+    @FXML
+    private Label txFecha;
+    @FXML
+    private ComboBox fecha;
     
     public Integer count;
     public getRegistroData d;
+    public Forms form;
     
     final ObservableList<Paciente> listaData = FXCollections.observableArrayList();
 
@@ -69,7 +72,7 @@ public class FXMLidController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         
-        // Set up the alumnos table
+        // Set up registro table
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
         table.setItems(listaData);
@@ -85,6 +88,22 @@ public class FXMLidController implements Initializable {
 	imgView2.setFitWidth(15);
 	imgView2.setFitHeight(15);
         pbNoFilter.setGraphic(imgView2);
+        
+        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                Paciente sel = (Paciente) table.getSelectionModel().getSelectedItem();
+                this.fecha.getItems().clear();
+                
+                try {
+                    ResultSet rs = this.d.getFechasById(sel.getId(), this.form);
+                    while(rs.next()){
+                        this.fecha.getItems().add(rs.getDate("FECHA"));
+                    }
+                } catch(Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        });
     }
     
     @FXML
@@ -102,6 +121,7 @@ public class FXMLidController implements Initializable {
     private void noFilterFired(ActionEvent event) {
         listaData.removeAll(listaData);
         LoadTable("");
+        this.fecha.getItems().clear();
     }
     
     @FXML
@@ -114,37 +134,87 @@ public class FXMLidController implements Initializable {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
 
         if (p != null) {
-            try {
+            Date f = (Date) this.fecha.getSelectionModel().getSelectedItem();
+            if (f != null) {
                 Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL); 
-                FXMLLoader fxml = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
-                Parent rCensal = (Parent) fxml.load(); 
+                FXMLLoader fxml;
 
-                stage.setTitle("Censal");
-                stage.setScene(new Scene(rCensal));
+                switch (this.form) {
+                    case VISITAS:
+/*                        fxml = new FXMLLoader(getClass().getResource("FXMLVisitas.fxml")); 
+                        Parent rVisitas = (Parent) fxml.load(); 
+                        stage.setTitle("Visitas");
+                        stage.setScene(new Scene(rVisitas));
+                        FXMLVisitasController visitas = fxml.<FXMLVisitasController>getController();
+                        visitas.SetData(p.getId(), f, true, d);
+                        
+                        stage.showAndWait();
+*/                        
+                        break;
+                }
 
-                FXMLCensalController censal = fxml.<FXMLCensalController>getController();
-                censal.SetData(p.getId(), true, d);
+            } else {
+                Alert wf = new Alert(Alert.AlertType.WARNING, "Seleccione una visita");
+                wf.setTitle("Seleccionar");
+                wf.setHeaderText("Falta información");
+                wf.showAndWait();
+            }
+/*            try {
+                id = p.getId();
 
-                stage.showAndWait();
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL); 
+                FXMLLoader fxml;
 
-                if (censal.changed) {
-                    ResultSet rs = d.getListaIdRs("IDPAC = ".concat(censal.updatedID));
-                    if (rs.next()){
-                        Paciente edited = new Paciente();
-                        edited.id.set(rs.getString("IDPAC"));
-                        edited.nom.set(rs.getString("NOMBRE"));
+                switch (this.form) {
+                    case CENSAL:
+                        fxml = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
+                        Parent rCensal = (Parent) fxml.load(); 
 
-                        // remove old selected item and add edited one
-                        this.listaData.remove(p);
-                        this.listaData.add(edited);
+                        stage.setTitle("Censal");
+                        stage.setScene(new Scene(rCensal));
 
-                        SortAndSelect(edited);
-                    }
+
+                        stage.showAndWait();
+
+                        if (censal.changed) {
+                            ResultSet rs = d.getListaIdRs("IDPAC = ".concat(censal.updatedID));
+                            if (rs.next()){
+                                Paciente edited = new Paciente();
+                                edited.id.set(rs.getString("IDPAC"));
+                                edited.nom.set(rs.getString("NOMBRE"));
+
+                                // remove old selected item and add edited one
+                                this.listaData.remove(p);
+                                this.listaData.add(edited);
+
+                                SortAndSelect(edited);
+                            }
+                        }
+
+                        break;            
+                    case VISITAS:
+                        fxml = new FXMLLoader(getClass().getResource("FXMLfecha.fxml")); 
+                        Parent rFecha = (Parent) fxml.load();
+
+                        stage.setTitle("Escoger visita");
+                        stage.setScene(new Scene(rFecha));
+
+                        FXMLfechaController fecha = fxml.<FXMLfechaController>getController();
+                        fecha.SetData(p, d, Forms.VISITAS);
+
+                        stage.showAndWait();
+                        break;
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-            }
+            }*/
+        } else {
+            Alert wp = new Alert(Alert.AlertType.WARNING, "Seleccione un paciente");
+            wp.setTitle("Seleccionar");
+            wp.setHeaderText("Falta información");
+            wp.showAndWait();
         }
     }
 
@@ -152,7 +222,7 @@ public class FXMLidController implements Initializable {
     private void deleteFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
         if (p != null) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará el paciente seleccionado y todos los registros relacionados.\n\n ¿Desea continuar?");
+/*            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará el paciente seleccionado y todos los registros relacionados.\n\n ¿Desea continuar?");
             confirm.setTitle("Eliminar");
             confirm.setHeaderText("Confirmar eliminación");
             Optional<ButtonType> result = confirm.showAndWait();
@@ -166,13 +236,13 @@ public class FXMLidController implements Initializable {
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }               
-            }
+            }*/
         }
     }
     
     @FXML
     private void newFired(ActionEvent event) {
-        try {
+/*        try {
             FXMLLoader fxmlCensal;
             fxmlCensal = new FXMLLoader(getClass().getResource("FXMLCensal.fxml")); 
             Parent rCensal = (Parent) fxmlCensal.load(); 
@@ -201,7 +271,7 @@ public class FXMLidController implements Initializable {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }
+        }*/
     }
 
     public void LoadTable(String filter) {
@@ -239,9 +309,15 @@ public class FXMLidController implements Initializable {
         }
     }
     
-    public void SetData(getRegistroData data) {
+    public void SetData(getRegistroData data, Forms f) {
         this.d = data;
+        this.form = f;
         LoadTable("");
+        switch (this.form) {
+            case VISITAS:
+                this.txFecha.setText("Visita:");
+                break;
+        }
     }
     
     private void closeWindow() {

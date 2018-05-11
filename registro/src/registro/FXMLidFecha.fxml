@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="399.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidController">
+<AnchorPane id="AnchorPane" prefHeight="399.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidFechaController">
    <children>
       <Label layoutX="26.0" layoutY="14.0" text="Buscar:">
          <font>
@@ -19,7 +19,7 @@
             <Font size="13.0" />
          </font>
       </TextField>
-      <TableView fx:id="table" layoutX="26.0" layoutY="74.0" prefHeight="235.0" prefWidth="313.0">
+      <TableView fx:id="table" layoutX="26.0" layoutY="74.0" prefHeight="170.0" prefWidth="313.0">
         <columns>
           <TableColumn fx:id="idCol" prefWidth="50.0" text="Id" />
             <TableColumn fx:id="nomCol" prefWidth="223.0" text="Nombre" />
@@ -31,7 +31,12 @@
             <Button fx:id="pbNoFilter" ellipsisString="" layoutX="305.0" layoutY="35.0" mnemonicParsing="false" onAction="#noFilterFired" prefHeight="25.0" prefWidth="25.0" textAlignment="CENTER" />
          </children>
       </HBox>
-      <Label fx:id="total" layoutX="26.0" layoutY="315.0" text="Label" />
+      <Label fx:id="total" layoutX="26.0" layoutY="244.0" prefHeight="17.0" prefWidth="313.0" text="Label" textAlignment="RIGHT" />
+      <Label fx:id="txFecha" layoutX="26.0" layoutY="270.0" text="Label">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
       <Button cancelButton="true" layoutX="37.0" layoutY="342.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
          <font>
             <Font size="13.0" />
@@ -52,5 +57,6 @@
             <Font size="13.0" />
          </font>
       </Button>
+      <ComboBox fx:id="fecha" layoutX="26.0" layoutY="296.0" prefHeight="25.0" prefWidth="313.0" />
    </children>
 </AnchorPane>
