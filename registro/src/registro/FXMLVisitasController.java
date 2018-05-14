@@ -59,6 +59,16 @@ public class FXMLVisitasController implements Initializable {
     private TextField ejer;
     @FXML
     private ComboBox dieta;
+    @FXML
+    private TextField tabaco;
+    @FXML
+    private ComboBox marca;
+    @FXML
+    private TextField alq;
+    @FXML
+    private TextField nic;
+    @FXML
+    private TextField co;
     
     private Boolean edit;
     private Boolean changed;
@@ -121,10 +131,9 @@ public class FXMLVisitasController implements Initializable {
         });
         this.he.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) { // we only care about loosing focus
-                if (!ValidateNumber(this.he.getText(),0.0,120.0,0)) this.he.requestFocus();
+                if (!ValidateNumber(this.he.getText(),0.0,60.0,0)) this.he.requestFocus();
             }
         });
-
 
         this.list.add(new CtrlCollection("EJER", CtrlType.TXT, this.ejer,""));
         this.ejer.setOnKeyTyped(keyevent ->{
@@ -132,17 +141,35 @@ public class FXMLVisitasController implements Initializable {
         });
         this.ejer.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) { // we only care about loosing focus
-                if (!ValidateNumber(this.ejer.getText(),0.0,120.0,0)) this.ejer.requestFocus();
+                if (!ValidateNumber(this.ejer.getText(),0.0,50.0,0)) this.ejer.requestFocus();
             }
         });
 
-        
         this.list.add(new CtrlCollection("DIETA", CtrlType.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP"));
         this.dieta.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) { // we only care about loosing focus
                 CheckValueIsInList(this.dieta);
             }
-        });        
+        });
+        
+        this.list.add(new CtrlCollection("TABACO", CtrlType.TXT, this.tabaco,""));
+        this.tabaco.setOnKeyTyped(keyevent ->{
+            if (!"0123456789".contains(keyevent.getCharacter())) keyevent.consume();
+        });
+        this.tabaco.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                if (!ValidateNumber(this.tabaco.getText(),0.0,80.0,0)) this.ejer.requestFocus();
+            }
+        });
+
+        this.list.add(new CtrlCollection("TIPOTA", CtrlType.COMBO, this.marca,"DTabaco;IDMARC;MARCA"));
+        this.marca.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                CheckValueIsInList(this.marca);
+                loadMarcaTab();
+            }
+        });
+        
     }
     
     public Boolean ValidateNumber(String c, Double min, Double max, Integer dec) {
@@ -221,6 +248,7 @@ public class FXMLVisitasController implements Initializable {
                     }
                     
                     computeIMC();
+                    loadMarcaTab();
                 }
             }
         } catch (Exception e) {
@@ -231,8 +259,25 @@ public class FXMLVisitasController implements Initializable {
     public void computeIMC() {
         if (!this.peso.getText().trim().isEmpty()) {
             Double p = Double.parseDouble(this.peso.getText());
-            Double IMC =(double) Math.round(p / Math.pow(this.talla,2) * 100) / 100;
+            Double IMC =(double) Math.round((p / Math.pow(this.talla,2)) * 100) / 100;
             this.imc.setText(IMC.toString());
+        }
+    }
+    
+    public void loadMarcaTab() {
+        if (this.marca.getValue() != null) {
+            String c = this.marca.getValue().toString();
+            
+            try {
+                ResultSet rs = d.getDatosMarcaTab(c);
+                if (rs.next()) {
+                    this.alq.setText(rs.getString("ALQUIT"));
+                    this.nic.setText(rs.getString("NICOT"));
+                    this.co.setText(rs.getString("CO"));
+                }
+            } catch (Exception e) {
+                showError(e.getMessage(),"Error cargando el diccionario");
+            }
         }
     }
     

@@ -208,6 +208,12 @@ public class getRegistroData {
     public ResultSet getDic(String dic) throws SQLException {
         return conn.prepareStatement("SELECT * FROM ".concat(dic)).executeQuery();
     }
+
+    public ResultSet getDatosMarcaTab(String marca) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM DTabaco WHERE MARCA = ?");
+        q.setString(1, marca);
+        return q.executeQuery();
+    }
     
     public String getDescripFromCod(String dic, String cod, Integer value, String descrip) throws SQLException {
         String d = "";

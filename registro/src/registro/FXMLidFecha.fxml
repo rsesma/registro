@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="399.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidFechaController">
+<AnchorPane id="AnchorPane" prefHeight="426.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLidFechaController">
    <children>
       <Label layoutX="26.0" layoutY="14.0" text="Buscar:">
          <font>
@@ -32,31 +32,31 @@
          </children>
       </HBox>
       <Label fx:id="total" alignment="BOTTOM_RIGHT" layoutX="26.0" layoutY="244.0" prefHeight="17.0" prefWidth="313.0" text="Label" textAlignment="RIGHT" />
-      <Label fx:id="txFecha" layoutX="26.0" layoutY="270.0" text="Label">
+      <Label fx:id="txFecha" layoutX="26.0" layoutY="261.0" text="Label">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <Button cancelButton="true" layoutX="37.0" layoutY="342.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
+      <Button cancelButton="true" layoutX="39.0" layoutY="382.0" mnemonicParsing="false" onAction="#cancelFired" prefHeight="30.0" text="Cancelar">
          <font>
             <Font size="13.0" />
          </font>
       </Button>
-      <Button layoutX="119.0" layoutY="342.0" mnemonicParsing="false" onAction="#deleteFired" prefHeight="30.0" text="Eliminar">
+      <Button layoutX="121.0" layoutY="382.0" mnemonicParsing="false" onAction="#deleteFired" prefHeight="30.0" text="Eliminar">
          <font>
             <Font size="13.0" />
          </font>
       </Button>
-      <Button layoutX="196.0" layoutY="342.0" mnemonicParsing="false" onAction="#newFired" prefHeight="30.0" text="Nuevo">
+      <Button layoutX="198.0" layoutY="382.0" mnemonicParsing="false" onAction="#newFired" prefHeight="30.0" text="Nuevo">
          <font>
             <Font size="13.0" />
          </font>
       </Button>
-      <Button layoutX="264.0" layoutY="342.0" mnemonicParsing="false" onAction="#editFired" prefHeight="30.0" text="Editar">
+      <Button layoutX="266.0" layoutY="382.0" mnemonicParsing="false" onAction="#editFired" prefHeight="30.0" text="Editar">
          <font>
             <Font size="13.0" />
          </font>
       </Button>
-      <ComboBox fx:id="fecha" layoutX="26.0" layoutY="296.0" prefHeight="25.0" prefWidth="313.0" />
+      <ListView fx:id="fecha" layoutX="26.0" layoutY="279.0" prefHeight="96.0" prefWidth="313.0" />
    </children>
 </AnchorPane>
