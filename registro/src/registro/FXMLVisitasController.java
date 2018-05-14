@@ -8,10 +8,13 @@ package registro;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.text.DecimalFormat;
+import java.text.ParsePosition;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -19,6 +22,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import org.controlsfx.control.textfield.TextFields;
 import registro.model.CtrlCollection;
 import registro.model.CtrlType;
@@ -47,6 +51,14 @@ public class FXMLVisitasController implements Initializable {
     private TextField gluc;
     @FXML
     private ComboBox diab;
+    @FXML
+    private ComboBox menop;
+    @FXML
+    private TextField he;
+    @FXML
+    private TextField ejer;
+    @FXML
+    private ComboBox dieta;
     
     private Boolean edit;
     private Boolean changed;
@@ -57,6 +69,8 @@ public class FXMLVisitasController implements Initializable {
     
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -67,46 +81,80 @@ public class FXMLVisitasController implements Initializable {
         this.list.add(new CtrlCollection("FECHA", CtrlType.DATE, this.fecha,""));
         
         this.list.add(new CtrlCollection("PESO", CtrlType.TXT, this.peso,""));
+        this.peso.setOnKeyTyped(keyevent ->{
+            if (!"0123456789.".contains(keyevent.getCharacter())) keyevent.consume();
+        });
         this.peso.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) { // we only care about loosing focus
-                if (ValidateNumber(this.peso,10.0,250.0,1,"Peso")) computeIMC();
+                if (ValidateNumber(this.peso.getText(),10.0,250.0,1)) computeIMC();
+                else this.peso.requestFocus();
             }
         });
         
         this.list.add(new CtrlCollection("GLUC", CtrlType.TXT, this.gluc,""));
+        this.gluc.setOnKeyTyped(keyevent ->{
+            if (!"0123456789".contains(keyevent.getCharacter())) keyevent.consume();
+        });
         this.gluc.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) { // we only care about loosing focus
-                ValidateNumber(this.gluc,20.0,1200.0,0,"Glucemia");
+                if (!ValidateNumber(this.gluc.getText(),20.0,1200.0,0)) this.gluc.requestFocus();
             }
         });
         
         this.list.add(new CtrlCollection("DIABET", CtrlType.COMBO, this.diab,"DSiNo;CODSN;DESCSN"));
         this.diab.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) { // we only care about loosing focus
-                System.out.println(this.diab.getValue().toString());
-                //CheckValueIsInList(this.diab);
+                CheckValueIsInList(this.diab);
             }
         });
+
+        this.list.add(new CtrlCollection("MENOP", CtrlType.COMBO, this.menop,"DSiNo;CODSN;DESCSN"));
+        this.menop.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                CheckValueIsInList(this.menop);
+            }
+        });
+        
+        this.list.add(new CtrlCollection("HE", CtrlType.TXT, this.he,""));
+        this.he.setOnKeyTyped(keyevent ->{
+            if (!"0123456789".contains(keyevent.getCharacter())) keyevent.consume();
+        });
+        this.he.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                if (!ValidateNumber(this.he.getText(),0.0,120.0,0)) this.he.requestFocus();
+            }
+        });
+
+
+        this.list.add(new CtrlCollection("EJER", CtrlType.TXT, this.ejer,""));
+        this.ejer.setOnKeyTyped(keyevent ->{
+            if (!"0123456789".contains(keyevent.getCharacter())) keyevent.consume();
+        });
+        this.ejer.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                if (!ValidateNumber(this.ejer.getText(),0.0,120.0,0)) this.ejer.requestFocus();
+            }
+        });
+
+        
+        this.list.add(new CtrlCollection("DIETA", CtrlType.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP"));
+        this.dieta.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                CheckValueIsInList(this.dieta);
+            }
+        });        
     }
     
-    public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec, String name) {
+    public Boolean ValidateNumber(String c, Double min, Double max, Integer dec) {
         Boolean ok = true;
-        if (!o.getText().trim().isEmpty()) {
-            String c = o.getText();
-            try {
-                Double v = Double.parseDouble(c);
-                if (v < min | v > max) {
-                    showError(name.concat(" debe estar entre ").concat(min.toString()).concat(" y ").concat(max.toString()), "Error de validación");
-                    o.requestFocus();
-                    ok = false;
-                } else if ((c.indexOf('.')>0) && (c.length() - c.indexOf('.') - 1)>dec) {
-                    showError("El número de decimales debe ser ".concat(dec.toString()), "Error de validación");
-                    o.requestFocus();
-                    ok = false;
-                }
-            } catch (Exception e) {
-                showError(name.concat(" debe ser numérico"), "Error de validación");
-                o.requestFocus();
+        if (!c.trim().isEmpty()) {
+            Double v = Double.parseDouble(c);
+            Integer nDec = c.indexOf('.') > 0 ? (c.length() - c.indexOf('.') - 1) : 0;
+            if (v < min | v > max) {
+                showError("El valor debe estar entre ".concat(min.toString()).concat(" y ").concat(max.toString()), "Error de validación");
+                ok = false;
+            } else if (nDec > dec) {
+                showError("El número de decimales debe ser ".concat(dec.toString()), "Error de validación");
                 ok = false;
             }
         }
@@ -114,14 +162,11 @@ public class FXMLVisitasController implements Initializable {
     }
     
     public void CheckValueIsInList(ComboBox o) {
-        if (o.getValue() != null) {
-            String c = o.getValue().toString();
+        String c = o.getEditor().getText();
+        if (!c.trim().isEmpty()) {
             if (!o.getItems().contains(c)) {
-                System.out.println("error");
-                showError("El valor no está en la lista admitida", "Error de validación");
+                showError("El valor " + c + " no está en la lista", "Error de validación");
                 o.requestFocus();
-            } else {
-                System.out.println("ok");
             }
         }
     }

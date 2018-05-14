@@ -10,55 +10,37 @@
 
 <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLVisitasController">
    <children>
-      <Label fx:id="nom" alignment="BOTTOM_RIGHT" layoutX="267.0" layoutY="14.0" prefHeight="17.0" prefWidth="212.0" text="Label" textAlignment="RIGHT">
+      <Label fx:id="nom" alignment="BOTTOM_RIGHT" layoutX="261.0" layoutY="14.0" prefHeight="17.0" prefWidth="212.0" text="Label" textAlignment="RIGHT">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Label>
-      <Label fx:id="edad" layoutX="489.0" layoutY="14.0" prefHeight="17.0" prefWidth="77.0" text="Label">
+      <Label fx:id="edad" layoutX="494.0" layoutY="14.0" prefHeight="17.0" prefWidth="77.0" text="Label">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Label>
-      <GridPane layoutX="14.0" layoutY="39.0" prefHeight="214.0" prefWidth="219.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="119.0" minWidth="10.0" prefWidth="69.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.0" minWidth="10.0" prefWidth="150.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="15.0" minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label text="Id. Pac" />
-            <Label text="Fecha visita" GridPane.rowIndex="1" />
-            <TextField fx:id="id" editable="false" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" />
-            <DatePicker fx:id="fecha" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="peso" layoutX="83.0" layoutY="13.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Label layoutX="10.0" layoutY="17.0" text="Peso" GridPane.rowIndex="3" />
-            <TextField fx:id="imc" editable="false" focusTraversable="false" layoutX="83.0" layoutY="88.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Label layoutX="10.0" layoutY="92.0" text="IMC" GridPane.rowIndex="4" />
-            <Label alignment="BOTTOM_LEFT" maxWidth="28.0" prefHeight="17.0" prefWidth="28.0" text="(kg)" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets left="90.0" />
-               </GridPane.margin>
-            </Label>
-            <TextField fx:id="gluc" focusTraversable="false" layoutX="77.0" layoutY="110.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-            <Label layoutX="10.0" layoutY="114.0" text="Glucemia" GridPane.rowIndex="6" />
-            <Label alignment="BOTTOM_LEFT" layoutX="164.0" layoutY="85.0" maxWidth="47.0" prefHeight="17.0" prefWidth="42.0" text="(mg/dl)" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="6">
-               <GridPane.margin>
-                  <Insets left="90.0" />
-               </GridPane.margin>
-            </Label>
-            <Label layoutX="10.0" layoutY="172.0" text="Diabetes" GridPane.rowIndex="7" />
-            <ComboBox fx:id="diab" editable="true" prefHeight="25.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-         </children>
-      </GridPane>
+      <Label layoutX="25.0" layoutY="60.0" text="Id. Pac" />
+      <TextField fx:id="id" disable="true" editable="false" focusTraversable="false" layoutX="105.0" layoutY="55.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" />
+      <Label layoutX="25.0" layoutY="95.0" text="Fecha visita" />
+      <DatePicker fx:id="fecha" layoutX="105.0" layoutY="90.0" prefWidth="120.0" />
+      <Label layoutX="25.0" layoutY="130.0" text="Peso" />
+      <TextField fx:id="peso" layoutX="105.0" layoutY="125.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" />
+      <Label alignment="BOTTOM_LEFT" layoutX="197.0" layoutY="130.0" maxWidth="28.0" prefHeight="17.0" prefWidth="28.0" text="(kg)" textAlignment="RIGHT" />
+      <Label layoutX="25.0" layoutY="165.0" text="IMC" />
+      <TextField fx:id="imc" editable="false" focusTraversable="false" layoutX="105.0" layoutY="160.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" />
+      <Label layoutX="25.0" layoutY="200.0" text="Glucemia" />
+      <TextField fx:id="gluc" layoutX="105.0" layoutY="195.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" />
+      <Label alignment="BOTTOM_LEFT" layoutX="197.0" layoutY="200.0" maxWidth="50.0" prefHeight="17.0" prefWidth="50.0" text="(mg/dl)" textAlignment="RIGHT" />
+      <Label layoutX="25.0" layoutY="235.0" text="Diabetes" />
+      <ComboBox fx:id="diab" editable="true" layoutX="105.0" layoutY="230.0" prefHeight="25.0" prefWidth="86.0" />
+      <Label layoutX="25.0" layoutY="270.0" text="Menopausia" />
+      <ComboBox fx:id="menop" editable="true" layoutX="105.0" layoutY="265.0" prefHeight="25.0" prefWidth="86.0" />
+      <Label layoutX="270.0" layoutY="60.0" text="Hábito enólico" />
+      <TextField fx:id="he" layoutX="370.0" layoutY="55.0" maxWidth="50.0" prefHeight="25.0" prefWidth="50.0" />
+      <Label layoutX="270.0" layoutY="95.0" text="Horas ejercicio" />
+      <TextField fx:id="ejer" layoutX="370.0" layoutY="90.0" maxWidth="50.0" prefHeight="25.0" prefWidth="50.0" />
+      <Label layoutX="270.0" layoutY="130.0" text="Dieta" />
+      <ComboBox fx:id="dieta" editable="true" layoutX="370.0" layoutY="125.0" prefHeight="27.0" prefWidth="117.0" />
    </children>
 </AnchorPane>
