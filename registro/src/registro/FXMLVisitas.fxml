@@ -38,7 +38,7 @@
          <children>
             <Label text="Id. Pac" />
             <Label text="Fecha visita" GridPane.rowIndex="1" />
-            <TextField fx:id="id" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" />
+            <TextField fx:id="id" editable="false" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" />
             <DatePicker fx:id="fecha" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="peso" layoutX="83.0" layoutY="13.0" maxWidth="85.0" prefHeight="25.0" prefWidth="85.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label layoutX="10.0" layoutY="17.0" text="Peso" GridPane.rowIndex="3" />
@@ -57,7 +57,7 @@
                </GridPane.margin>
             </Label>
             <Label layoutX="10.0" layoutY="172.0" text="Diabetes" GridPane.rowIndex="7" />
-            <ComboBox fx:id="diab" prefHeight="25.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <ComboBox fx:id="diab" editable="true" prefHeight="25.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
          </children>
       </GridPane>
    </children>

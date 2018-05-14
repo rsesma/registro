@@ -204,4 +204,19 @@ public class getRegistroData {
         q.setDate(2, fecha);
         return q.executeQuery();
     }
+
+    public ResultSet getDic(String dic) throws SQLException {
+        return conn.prepareStatement("SELECT * FROM ".concat(dic)).executeQuery();
+    }
+    
+    public String getDescripFromCod(String dic, String cod, Integer value, String descrip) throws SQLException {
+        String d = "";
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM " + dic + " WHERE " + cod + " = ?");
+        q.setInt(1, value);
+        ResultSet rs = q.executeQuery();
+        if (rs.next()) {
+            return rs.getString(descrip);
+        }
+        return d;
+    }
 }

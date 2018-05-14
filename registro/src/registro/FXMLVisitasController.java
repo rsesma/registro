@@ -19,6 +19,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import org.controlsfx.control.textfield.TextFields;
 import registro.model.CtrlCollection;
 import registro.model.CtrlType;
 import registro.model.getRegistroData;
@@ -78,6 +79,14 @@ public class FXMLVisitasController implements Initializable {
                 ValidateNumber(this.gluc,20.0,1200.0,0,"Glucemia");
             }
         });
+        
+        this.list.add(new CtrlCollection("DIABET", CtrlType.COMBO, this.diab,"DSiNo;CODSN;DESCSN"));
+        this.diab.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) { // we only care about loosing focus
+                System.out.println(this.diab.getValue().toString());
+                //CheckValueIsInList(this.diab);
+            }
+        });
     }
     
     public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec, String name) {
@@ -102,6 +111,19 @@ public class FXMLVisitasController implements Initializable {
             }
         }
         return ok;
+    }
+    
+    public void CheckValueIsInList(ComboBox o) {
+        if (o.getValue() != null) {
+            String c = o.getValue().toString();
+            if (!o.getItems().contains(c)) {
+                System.out.println("error");
+                showError("El valor no está en la lista admitida", "Error de validación");
+                o.requestFocus();
+            } else {
+                System.out.println("ok");
+            }
+        }
     }
     
     public void SetData(String id, Date fecha, Boolean lEdit, getRegistroData data) {
@@ -132,6 +154,24 @@ public class FXMLVisitasController implements Initializable {
                                     c.oDate.setValue(f.toLocalDate());
                                 }
                                 break;
+                            case COMBO:
+                                try {
+                                    ResultSet rsDic = d.getDic(c.dic);
+                                    while (rsDic.next()) {
+                                        c.oCombo.getItems().add(rsDic.getString(c.descrip));
+                                    }
+                                    rsDic.close();
+                                    
+                                    Integer val = rs.getInt(c.field);
+                                    if (!rs.wasNull()) {
+                                        c.oCombo.setValue(d.getDescripFromCod(c.dic, c.cod, val, c.descrip));
+                                    }
+                                    
+                                    TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
+                                } catch (Exception e) {
+                                    showError(e.getMessage(),"Error obteniendo diccionario");
+                                }
+                                break;
                         }
                     }
                     
@@ -139,7 +179,7 @@ public class FXMLVisitasController implements Initializable {
                 }
             }
         } catch (Exception e) {
-            showError(e.getMessage(),"Mensaje de error");
+            showError(e.getMessage(),"Error obteniendo visita");
         }
     }
     

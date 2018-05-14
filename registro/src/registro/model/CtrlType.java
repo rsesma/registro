@@ -10,5 +10,5 @@ package registro.model;
  * @author r
  */
 public enum CtrlType {
-    TXT, DATE, RB, MEMO
+    TXT, DATE, RB, COMBO, MEMO
 }
