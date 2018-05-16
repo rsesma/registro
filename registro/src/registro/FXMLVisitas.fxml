@@ -48,7 +48,7 @@
       <TextField fx:id="tabaco" layoutX="330.0" layoutY="160.0" maxWidth="50.0" prefHeight="25.0" prefWidth="50.0" />
       <Label alignment="BOTTOM_LEFT" layoutX="390.0" layoutY="166.0" maxWidth="85.0" prefHeight="17.0" prefWidth="85.0" text="cigarrillos/día" textAlignment="RIGHT" />
       <Label layoutX="270.0" layoutY="200.0" text="Marca" />
-      <ComboBox fx:id="marca" editable="true" layoutX="330.0" layoutY="195.0" prefHeight="27.0" prefWidth="142.0" />
+      <ComboBox fx:id="marca" editable="true" layoutX="330.0" layoutY="195.0" prefHeight="27.0" prefWidth="166.0" />
       <Label layoutX="270.0" layoutY="236.0" text="Alquitrán" />
       <TextField fx:id="alq" disable="true" editable="false" focusTraversable="false" layoutX="330.0" layoutY="231.0" maxWidth="50.0" prefHeight="25.0" prefWidth="50.0" />
       <Label alignment="BOTTOM_LEFT" layoutX="390.0" layoutY="236.0" maxWidth="85.0" prefHeight="17.0" prefWidth="26.0" text="mg" textAlignment="RIGHT" />

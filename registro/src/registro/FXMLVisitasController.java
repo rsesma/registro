@@ -9,13 +9,11 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.time.temporal.ChronoUnit;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -25,13 +23,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.KeyEvent;
-import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 import registro.model.CtrlCollection;
 import registro.model.CtrlType;
-import registro.model.Farmaco;
+import registro.model.Tratamiento;
 import registro.model.getRegistroData;
 
 /**
@@ -92,7 +88,7 @@ public class FXMLVisitasController implements Initializable {
     @FXML
     private TextField trig;
     @FXML
-    private TableView<Farmaco> SFarm;
+    private TableView<Tratamiento> SFarm;
 
     
     private Boolean edit;
@@ -102,7 +98,7 @@ public class FXMLVisitasController implements Initializable {
     
     public List<CtrlCollection> list = new LinkedList<>();
     
-    private List<Map.Entry<String,Long>> cumplList = new ArrayList<>();
+    final ObservableList<Tratamiento> trat = FXCollections.observableArrayList();
     
     /**
      * Initializes the controller class.
@@ -119,109 +115,52 @@ public class FXMLVisitasController implements Initializable {
         this.list.add(new CtrlCollection("IDPACV", CtrlType.TXT, this.id,""));
         this.list.add(new CtrlCollection("FECHA", CtrlType.DATE, this.fecha,""));
         
-        this.list.add(new CtrlCollection("PESO", CtrlType.TXT, this.peso,""));
-        this.peso.setOnKeyTyped((KeyEvent e) -> { if (!vdec.contains(e.getCharacter())) e.consume(); });
+        this.list.add(new CtrlCollection("PESO", CtrlType.TXT, this.peso,"20;200;1"));
+        this.peso.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) computeIMC();
+        });
+
+        this.list.add(new CtrlCollection("GLUC", CtrlType.TXT, this.gluc,"20;1200;0"));
+        this.list.add(new CtrlCollection("DIABET", CtrlType.COMBO, this.diab,"DSiNo;CODSN;DESCSN"));
+        this.list.add(new CtrlCollection("MENOP", CtrlType.COMBO, this.menop,"DSiNo;CODSN;DESCSN"));
+        
+        this.list.add(new CtrlCollection("HE", CtrlType.TXT, this.he,"0;60;0"));
+        this.list.add(new CtrlCollection("EJER", CtrlType.TXT, this.ejer,"0;50;0"));
+        this.list.add(new CtrlCollection("DIETA", CtrlType.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP"));
+        
+        this.list.add(new CtrlCollection("TABACO", CtrlType.TXT, this.tabaco,"0;80;0"));
+        this.list.add(new CtrlCollection("TIPOTA", CtrlType.COMBO, this.marca,"DTabaco;IDMARC;MARCA"));
+        this.marca.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) loadMarcaTab();
+        });
+        
+        this.list.add(new CtrlCollection("PULSO", CtrlType.TXT, this.pulso,"5;300;0"));
+        this.list.add(new CtrlCollection("TAMAX", CtrlType.TXT, this.pas,"50;200;0"));
+        this.list.add(new CtrlCollection("TAMIN", CtrlType.TXT, this.pad,"50;150;0"));
+        this.list.add(new CtrlCollection("CT", CtrlType.TXT, this.ct,"50;300;0"));
+        this.ct.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) computeIA();
+        });
+        this.list.add(new CtrlCollection("CLDL", CtrlType.TXT, this.ldl,"50;300;0"));
+        this.list.add(new CtrlCollection("CHDL", CtrlType.TXT, this.hdl,"20;200;0"));
+        this.hdl.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
+        this.hdl.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) computeIA();
+        });
+        this.list.add(new CtrlCollection("TG", CtrlType.TXT, this.trig,"50;600;0"));
+
+        
+/*      this.peso.setOnKeyTyped((KeyEvent e) -> { if (!vdec.contains(e.getCharacter())) e.consume(); });
         this.peso.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 if (ValidateNumber(this.peso, 20.0, 200.0, 1)) computeIMC();
             }
         });
         
-        this.list.add(new CtrlCollection("GLUC", CtrlType.TXT, this.gluc,""));
-        this.gluc.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.gluc.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.gluc, 20.0, 1200.0, 0);
-        });
-        
-        this.list.add(new CtrlCollection("DIABET", CtrlType.COMBO, this.diab,"DSiNo;CODSN;DESCSN"));
         this.diab.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) CheckValueIsInList(this.diab);
 
-        });
-
-        this.list.add(new CtrlCollection("MENOP", CtrlType.COMBO, this.menop,"DSiNo;CODSN;DESCSN"));
-        this.menop.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue) CheckValueIsInList(this.menop);
-        });
-        
-        this.list.add(new CtrlCollection("HE", CtrlType.TXT, this.he,""));
-        this.he.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.he.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.he, 0.0, 60.0, 0);
-        });
-
-        this.list.add(new CtrlCollection("EJER", CtrlType.TXT, this.ejer,""));
-        this.ejer.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.ejer.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.ejer, 0.0, 50.0, 0);
-        });
-
-
-        this.list.add(new CtrlCollection("DIETA", CtrlType.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP"));
-        this.dieta.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue) CheckValueIsInList(this.dieta);
-        });
-        
-        this.list.add(new CtrlCollection("TABACO", CtrlType.TXT, this.tabaco,""));
-        this.tabaco.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.tabaco.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.tabaco, 0.0, 80.0, 0);
-        });
-
-
-        this.list.add(new CtrlCollection("TIPOTA", CtrlType.COMBO, this.marca,"DTabaco;IDMARC;MARCA"));
-        this.marca.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue) { // we only care about loosing focus
-                CheckValueIsInList(this.marca);
-                loadMarcaTab();
-            }
-        });
-        
-        this.list.add(new CtrlCollection("PULSO", CtrlType.TXT, this.pulso,""));
-        this.pulso.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.pulso.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.pulso, 5.0, 300.0, 0);
-        });
-
-        this.list.add(new CtrlCollection("TAMAX", CtrlType.TXT, this.pas,""));
-        this.pas.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.pas.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.pas, 50.0, 200.0, 0);
-        });
-        
-        this.list.add(new CtrlCollection("TAMIN", CtrlType.TXT, this.pad,""));
-        this.pad.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.pad.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.pad, 50.0, 150.0, 0);
-        });
-
-        this.list.add(new CtrlCollection("CT", CtrlType.TXT, this.ct,""));
-        this.ct.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.ct.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                if (ValidateNumber(this.ct, 50.0, 300.0, 0)) computeIA();
-            }
-        });
-        
-        this.list.add(new CtrlCollection("CLDL", CtrlType.TXT, this.ldl,""));
-        this.ldl.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.ldl.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.ldl, 50.0, 300.0, 0);
-        });
-
-        this.list.add(new CtrlCollection("CHDL", CtrlType.TXT, this.hdl,""));
-        this.hdl.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.hdl.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                if (ValidateNumber(this.hdl, 20.0, 200.0, 0)) computeIA();
-            }
-        });
-
-        this.list.add(new CtrlCollection("TG", CtrlType.TXT, this.trig,""));
-        this.trig.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
-        this.trig.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) ValidateNumber(this.trig, 50.0, 600.0, 0);
-        });
+        });*/
     }
 
     public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec) {
@@ -255,43 +194,29 @@ public class FXMLVisitasController implements Initializable {
         }
     }
     
-    class EntryStringConverter extends StringConverter {
-        @Override
-        public String toString(Object object) {
-            return object.toString();
-        }
-        
-        @Override
-        public Entry fromString(String string) {
-            return null;
-        }
-    }
-    
     public void SetData(String id, Date fecha, Boolean lEdit, getRegistroData data) {
         this.d = data;
         this.edit = lEdit;
         
         try {
-            // build DCumpl dictionary
-            ResultSet rsCumpli = d.getDic("DCumpl");
-            while (rsCumpli.next()) {
-                cumplList.add(new SimpleEntry<>(rsCumpli.getString("DESCMP"),rsCumpli.getLong("CODCMP")));
-            }
-            rsCumpli.close();
+            // build Farmacos subform
+            TableColumn<Tratamiento, String> farmCol = new TableColumn<>("Fármaco");
+            farmCol.setCellValueFactory(cellData -> cellData.getValue().farmacoProperty());
+            farmCol.setMinWidth(500);
 
-/*            // build Farmacos subform
-            TableColumn<Farmaco, Entry> cumplCol = new TableColumn<>("Cumplimiento");
-            cumplCol.setCellValueFactory(cellData -> cellData.getValue().cumplProperty());
-            cumplCol.setCellFactory(ComboBoxTableCell.forTableColumn(new EntryStringConverter(), cumplList));
-            cumplCol.
+            TableColumn<Tratamiento, String> cumplCol = new TableColumn<>("Cumplimiento");
+            cumplCol.setCellValueFactory(cellData -> cellData.getValue().cumplimientoProperty());
+            cumplCol.setMinWidth(100);            
+            
+            SFarm.getColumns().add(farmCol);
             SFarm.getColumns().add(cumplCol);
             
             // populate Farmacos subform
             SFarm.getItems().addAll(
-                new Farmaco("Bueno",Long.getLong("2")),
-                new Farmaco("Malo",Long.getLong("0")),
-                new Farmaco("Aceptable",Long.getLong("1"))
-            );*/
+                new Tratamiento(Long.getLong("60000"),"Aspirina",Long.getLong("0"),"Malo"),
+                new Tratamiento(Long.getLong("60001"),"Aspirina Clase 1",Long.getLong("2"),"Bueno"),
+                new Tratamiento(Long.getLong("60002"),"Aspirina Clase 2",Long.getLong("1"),"Aceptable")
+            );
             
             if (this.edit) {
                 ResultSet rs = d.getVisitasByIdFecha(id, fecha);
@@ -307,7 +232,7 @@ public class FXMLVisitasController implements Initializable {
                             case TXT:
                                 v = rs.getString(c.field);
                                 if (!rs.wasNull()) {
-                                    c.oTxt.setText(v); 
+                                    c.oTxt.setText(v);
                                 }
                                 break;
                             case DATE:
@@ -338,6 +263,7 @@ public class FXMLVisitasController implements Initializable {
                     }
                     
                     computeIMC();
+                    computeIA();
                     loadMarcaTab();
                 }
             }
@@ -348,9 +274,13 @@ public class FXMLVisitasController implements Initializable {
     
     public void computeIMC() {
         if (!this.peso.getText().trim().isEmpty()) {
-            Double p = Double.parseDouble(this.peso.getText());
-            Double IMC =(double) Math.round((p / Math.pow(this.talla,2)) * 100) / 100;
-            this.imc.setText(IMC.toString());
+            try {
+                Double p = Double.parseDouble(this.peso.getText());
+                Double IMC =(double) Math.round((p / Math.pow(this.talla,2)) * 100) / 100;
+                this.imc.setText(IMC.toString());
+            } catch (Exception e) {
+                this.imc.setText("");
+            }
         } else {
             this.imc.setText("");
         }
@@ -358,10 +288,14 @@ public class FXMLVisitasController implements Initializable {
     
     public void computeIA() {
         if (!this.ct.getText().trim().isEmpty() & !this.hdl.getText().trim().isEmpty()) {
-            Double ctotal = Double.parseDouble(this.ct.getText());
-            Double chdl = Double.parseDouble(this.hdl.getText());
-            Double IA =(double) Math.round((ctotal / chdl) * 100) / 100;
-            this.ia.setText(IA.toString());
+            try {
+                Double ctotal = Double.parseDouble(this.ct.getText());
+                Double chdl = Double.parseDouble(this.hdl.getText());
+                Double IA =(double) Math.round((ctotal / chdl) * 100) / 100;
+                this.ia.setText(IA.toString());
+            } catch (Exception e) {
+                this.ia.setText("");
+            }
         } else {
             this.ia.setText("");
         }
@@ -369,7 +303,10 @@ public class FXMLVisitasController implements Initializable {
     
     public void loadMarcaTab() {
         if (this.marca.getValue() != null) {
-            String c = this.marca.getValue().toString();
+            String c = this.marca.getEditor().getText();
+            if (c.trim().isEmpty()) {
+                c = this.marca.getValue().toString();
+            }
             
             try {
                 ResultSet rs = d.getDatosMarcaTab(c);
@@ -377,10 +314,18 @@ public class FXMLVisitasController implements Initializable {
                     this.alq.setText(rs.getString("ALQUIT"));
                     this.nic.setText(rs.getString("NICOT"));
                     this.co.setText(rs.getString("CO"));
+                } else {
+                    this.alq.setText("");
+                    this.nic.setText("");
+                    this.co.setText("");
                 }
             } catch (Exception e) {
                 showError(e.getMessage(),"Error cargando el diccionario");
             }
+        } else {
+            this.alq.setText("");
+            this.nic.setText("");
+            this.co.setText("");            
         }
     }
     

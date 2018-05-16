@@ -12,6 +12,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 
 /**
  *
@@ -24,6 +25,9 @@ public class CtrlCollection implements java.io.Serializable {
     public String dic;
     public String cod;
     public String descrip;
+    public Double min;
+    public Double max;
+    public Integer dec;
     public CtrlType type;
     
     public TextField oTxt;
@@ -39,6 +43,24 @@ public class CtrlCollection implements java.io.Serializable {
         switch (this.type) {
             case TXT:
                 this.oTxt = (TextField) o;
+                if (!c.trim().isEmpty()) {
+                    this.min = Double.parseDouble(c.split(";")[0]);
+                    this.max = Double.parseDouble(c.split(";")[1]);
+                    this.dec = Integer.parseInt(c.split(";")[2]);
+                    
+                    // allow numeric input only
+                    this.oTxt.setOnKeyTyped((KeyEvent e) -> { 
+                        if (this.dec==0) {
+                            if (!"0123456789".contains(e.getCharacter())) e.consume(); 
+                        } else {
+                            if (!"0123456789.".contains(e.getCharacter())) e.consume(); 
+                        }
+                    });
+                } else {
+                    this.min = null;
+                    this.max = null;
+                    this.dec = null;
+                }
                 break;
             case DATE:
                 this.oDate = (DatePicker) o;
