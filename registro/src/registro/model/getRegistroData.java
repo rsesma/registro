@@ -225,4 +225,22 @@ public class getRegistroData {
         }
         return d;
     }
+    
+    public ResultSet getFarmacosByIdFecha(String id, Date fecha) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM CFarmacos WHERE IDPACF = ? AND FECHAF = ?");
+        q.setString(1, id);
+        q.setDate(2, fecha);
+        return q.executeQuery();
+    }
+    
+    public ResultSet getFarmacById(String cod) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM DVadem WHERE IDFARM = ? ORDER BY FARM");
+        q.setString(1, cod);
+        return q.executeQuery();
+    }
+
+    public ResultSet getFarmacByDescrip(String c) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM DVadem WHERE FARM LIKE '%" + c +"%' ORDER BY FARM");
+        return q.executeQuery();
+    }
 }

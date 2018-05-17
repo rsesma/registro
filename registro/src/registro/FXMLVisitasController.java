@@ -9,13 +9,19 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -24,6 +30,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 import registro.model.CtrlCollection;
 import registro.model.CtrlType;
@@ -109,8 +117,6 @@ public class FXMLVisitasController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         this.changed = false;
-        String valid = "0123456789";
-        String vdec = "0123456789.";
         
         this.list.add(new CtrlCollection("IDPACV", CtrlType.TXT, this.id,""));
         this.list.add(new CtrlCollection("FECHA", CtrlType.DATE, this.fecha,""));
@@ -143,55 +149,12 @@ public class FXMLVisitasController implements Initializable {
         });
         this.list.add(new CtrlCollection("CLDL", CtrlType.TXT, this.ldl,"50;300;0"));
         this.list.add(new CtrlCollection("CHDL", CtrlType.TXT, this.hdl,"20;200;0"));
-        this.hdl.setOnKeyTyped((KeyEvent e) -> { if (!valid.contains(e.getCharacter())) e.consume(); });
         this.hdl.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) computeIA();
         });
         this.list.add(new CtrlCollection("TG", CtrlType.TXT, this.trig,"50;600;0"));
 
-        
-/*      this.peso.setOnKeyTyped((KeyEvent e) -> { if (!vdec.contains(e.getCharacter())) e.consume(); });
-        this.peso.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                if (ValidateNumber(this.peso, 20.0, 200.0, 1)) computeIMC();
-            }
-        });
-        
-        this.diab.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue) CheckValueIsInList(this.diab);
-
-        });*/
-    }
-
-    public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec) {
-        Boolean ok = true;
-        String c = o.getText();
-        if (!c.trim().isEmpty()) {
-            Double v = Double.parseDouble(c);
-            Integer nDec = c.indexOf('.') > 0 ? (c.length() - c.indexOf('.') - 1) : 0;
-            if (v < min | v > max) {
-                showError("El valor debe estar entre ".concat(min.toString()).concat(" y ").concat(max.toString()), "Error de validación");
-                ok = false;
-            } else if (nDec > dec) {
-                showError("El número de decimales debe ser ".concat(dec.toString()), "Error de validación");
-                ok = false;
-            }
-            if (!ok) {
-                o.undo();
-                o.requestFocus();
-            }
-        }
-        return ok;
-    }
-    
-    public void CheckValueIsInList(ComboBox o) {
-        String c = o.getEditor().getText();
-        if (!c.trim().isEmpty()) {
-            if (!o.getItems().contains(c)) {
-                showError("El valor " + c + " no está en la lista", "Error de validación");
-                o.requestFocus();
-            }
-        }
+        SFarm.setItems(trat);
     }
     
     public void SetData(String id, Date fecha, Boolean lEdit, getRegistroData data) {
@@ -210,14 +173,7 @@ public class FXMLVisitasController implements Initializable {
             
             SFarm.getColumns().add(farmCol);
             SFarm.getColumns().add(cumplCol);
-            
-            // populate Farmacos subform
-            SFarm.getItems().addAll(
-                new Tratamiento(Long.getLong("60000"),"Aspirina",Long.getLong("0"),"Malo"),
-                new Tratamiento(Long.getLong("60001"),"Aspirina Clase 1",Long.getLong("2"),"Bueno"),
-                new Tratamiento(Long.getLong("60002"),"Aspirina Clase 2",Long.getLong("1"),"Aceptable")
-            );
-            
+                        
             if (this.edit) {
                 ResultSet rs = d.getVisitasByIdFecha(id, fecha);
                 if (rs.next()) {
@@ -265,10 +221,100 @@ public class FXMLVisitasController implements Initializable {
                     computeIMC();
                     computeIA();
                     loadMarcaTab();
+                    
+                    LoadFarmacos(rs.getString("IDPACV"),rs.getDate("FECHA"));
                 }
             }
         } catch (Exception e) {
             showError(e.getMessage(),"Error obteniendo visita");
+        }
+    }
+    
+    @FXML
+    private void editTratamiento(ActionEvent event) {
+        if (!this.trat.isEmpty()) {
+            Tratamiento t = SFarm.getSelectionModel().getSelectedItem();
+            if (t != null) {
+                NewEditTratamiento(true, t);
+            } else {
+                Alert wf = new Alert(Alert.AlertType.WARNING, "Seleccione un fármaco");
+                wf.setTitle("Seleccionar");
+                wf.setHeaderText("Falta información");
+                wf.showAndWait();
+            }
+        }
+    }
+
+    @FXML
+    private void newTratamiento(ActionEvent event) {
+        NewEditTratamiento(false, null);
+    }
+    
+    public void NewEditTratamiento(Boolean edit, Tratamiento t) {
+        try {
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL); 
+            FXMLLoader fxml = new FXMLLoader(getClass().getResource("FXMLFarmac.fxml")); 
+            Parent rFarm = (Parent) fxml.load(); 
+            stage.setTitle("Fármaco");
+            stage.setScene(new Scene(rFarm));
+            FXMLFarmacController farm = fxml.<FXMLFarmacController>getController();
+            if (edit) farm.SetData(t.getFarm(), t.getCumpl(), true, d);
+            else farm.SetData("", "", false, d);
+
+            stage.showAndWait();
+
+            if (farm.changed) {
+                // edited item to update
+                Tratamiento edited = new Tratamiento(farm.farm, farm.descFarm, farm.cumpl, farm.descCumpl);
+
+                // remove old selected item and add edited one
+                if (edit) this.trat.remove(t);
+                this.trat.add(edited);
+
+                SortAndSelect(edited);
+            }
+        } catch (Exception e) {
+            showError(e.getMessage(),"Error abriendo la ventana");
+        }
+    }
+
+    @FXML
+    private void delTratamiento(ActionEvent event) {
+        if (!this.trat.isEmpty()) {
+            Tratamiento t = SFarm.getSelectionModel().getSelectedItem();
+            if (t != null) {
+                this.trat.remove(t);
+            } else {
+                Alert wf = new Alert(Alert.AlertType.WARNING, "Seleccione el fármaco a eliminar");
+                wf.setTitle("Seleccionar");
+                wf.setHeaderText("Falta información");
+                wf.showAndWait();
+            }
+        }
+    }
+
+    @FXML
+    private void cancel(ActionEvent event) {
+        closeWindow();
+    }
+
+    @FXML
+    private void ok(ActionEvent event) {
+        this.changed = true;
+        
+        closeWindow();
+    }
+    
+    public void LoadFarmacos(String id, Date fecha) {
+        try {
+            ResultSet rs = d.getFarmacosByIdFecha(id,fecha);
+            while (rs.next()) {
+                trat.add(new Tratamiento(rs.getString("FARMAC"),rs.getString("FARM"),rs.getString("CUMPLI"),rs.getString("DESCMP")));
+            }
+            
+        } catch (Exception e) {
+            showError(e.getMessage(),"Error obteniendo fármaco");
         }
     }
     
@@ -327,6 +373,56 @@ public class FXMLVisitasController implements Initializable {
             this.nic.setText("");
             this.co.setText("");            
         }
+    }
+    
+    public void SortAndSelect(Tratamiento item) {
+        // sort list and select item
+        Comparator<Tratamiento> comparator = Comparator.comparing(Tratamiento::getFarmaco); 
+        FXCollections.sort(trat, comparator);
+
+        if (item != null) {
+            SFarm.getSelectionModel().select(item);
+            SFarm.scrollTo(item);
+        } else {
+            SFarm.getSelectionModel().selectFirst();
+            SFarm.scrollTo(1);
+        }
+    }
+    
+    public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec) {
+        Boolean ok = true;
+        String c = o.getText();
+        if (!c.trim().isEmpty()) {
+            Double v = Double.parseDouble(c);
+            Integer nDec = c.indexOf('.') > 0 ? (c.length() - c.indexOf('.') - 1) : 0;
+            if (v < min | v > max) {
+                showError("El valor debe estar entre ".concat(min.toString()).concat(" y ").concat(max.toString()), "Error de validación");
+                ok = false;
+            } else if (nDec > dec) {
+                showError("El número de decimales debe ser ".concat(dec.toString()), "Error de validación");
+                ok = false;
+            }
+            if (!ok) {
+                o.undo();
+                o.requestFocus();
+            }
+        }
+        return ok;
+    }
+    
+    public void CheckValueIsInList(ComboBox o) {
+        String c = o.getEditor().getText();
+        if (!c.trim().isEmpty()) {
+            if (!o.getItems().contains(c)) {
+                showError("El valor " + c + " no está en la lista", "Error de validación");
+                o.requestFocus();
+            }
+        }
+    }
+    
+    private void closeWindow() {
+        Stage stage = (Stage) this.SFarm.getScene().getWindow();
+        stage.close();
     }
     
     public void showError(String message, String header) {

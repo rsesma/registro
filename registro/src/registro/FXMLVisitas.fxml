@@ -8,9 +8,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="755.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLVisitasController">
+<AnchorPane id="AnchorPane" prefHeight="618.0" prefWidth="755.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLVisitasController">
    <children>
-      <Label fx:id="nom" alignment="BOTTOM_RIGHT" layoutX="416.0" layoutY="14.0" prefHeight="17.0" prefWidth="212.0" text="Label" textAlignment="RIGHT">
+      <Label fx:id="nom" alignment="BOTTOM_RIGHT" layoutX="428.0" layoutY="14.0" prefHeight="17.0" prefWidth="212.0" text="Label" textAlignment="RIGHT">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
@@ -85,6 +85,15 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <TableView fx:id="SFarm" editable="true" layoutX="25.0" layoutY="375.0" prefHeight="200.0" prefWidth="637.0" />
+      <TableView fx:id="SFarm" editable="true" layoutX="25.0" layoutY="375.0" prefHeight="182.0" prefWidth="637.0" />
+      <Button layoutX="673.0" layoutY="375.0" mnemonicParsing="false" onAction="#editTratamiento" prefWidth="70.0" text="Editar" />
+      <Button layoutX="673.0" layoutY="410.0" mnemonicParsing="false" onAction="#newTratamiento" prefWidth="70.0" text="Nuevo" />
+      <Button layoutX="673.0" layoutY="446.0" mnemonicParsing="false" onAction="#delTratamiento" prefWidth="70.0" text="Eliminar" />
+      <Button layoutX="668.0" layoutY="577.0" mnemonicParsing="false" onAction="#ok" prefHeight="30.0" prefWidth="80.0" text="Aceptar">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+      <Button cancelButton="true" layoutX="576.0" layoutY="577.0" mnemonicParsing="false" onAction="#cancel" prefHeight="30.0" prefWidth="80.0" text="Cancelar" />
    </children>
 </AnchorPane>

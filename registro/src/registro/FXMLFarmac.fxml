@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="332.0" prefWidth="511.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="registro.FXMLFarmacController">
+   <children>
+      <Label layoutX="18.0" layoutY="14.0" text="Buscar:" />
+      <TextField fx:id="farmac" layoutX="18.0" layoutY="37.0" prefHeight="27.0" prefWidth="439.0" />
+      <Button fx:id="pbSearch" defaultButton="true" layoutX="465.0" layoutY="35.0" mnemonicParsing="false" onAction="#searchFarm" prefHeight="30.0" prefWidth="30.0" />
+      <TableView fx:id="table" layoutX="17.0" layoutY="75.0" prefHeight="151.0" prefWidth="477.0" />
+      <Label alignment="TOP_RIGHT" layoutX="18.0" layoutY="239.0" prefHeight="17.0" prefWidth="312.0" text="Grado de cumplimiento del tratamiento:" />
+      <ComboBox fx:id="cumpli" layoutX="348.0" layoutY="234.0" prefHeight="27.0" prefWidth="147.0" />
+      <Button layoutX="429.0" layoutY="282.0" mnemonicParsing="false" onAction="#pbAceptar" prefHeight="30.0" text="Aceptar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button cancelButton="true" layoutX="347.0" layoutY="282.0" mnemonicParsing="false" onAction="#pbCancelar" prefHeight="30.0" text="Cancelar">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

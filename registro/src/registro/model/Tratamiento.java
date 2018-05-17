@@ -13,12 +13,12 @@ import javafx.beans.property.StringProperty;
  * @author r
  */
 public class Tratamiento {
-    private final Long farm;
+    private final String farm;
     private final SimpleStringProperty farmaco = new SimpleStringProperty();
-    private final Long cumpl;
+    private final String cumpl;
     private final SimpleStringProperty cumplimiento = new SimpleStringProperty();
 
-    public Tratamiento(Long farm, String farmaco, Long cumpl, String cumplimiento) {
+    public Tratamiento(String farm, String farmaco, String cumpl, String cumplimiento) {
         this.farm = farm;
         setFarmaco(farmaco);
         this.cumpl = cumpl;
@@ -50,11 +50,11 @@ public class Tratamiento {
         this.farmacoProperty().set(f);
     }
 
-    public final Long getFarm() {
+    public final String getFarm() {
         return this.farm;
     }
 
-    public final Long getCumpl() {
+    public final String getCumpl() {
         return this.cumpl;
     }
 }
