@@ -8,12 +8,13 @@ package registro;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,13 +24,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
@@ -103,6 +104,10 @@ public class FXMLVisitasController implements Initializable {
     private Boolean changed;
     private getRegistroData d;
     private Double talla;
+    private LocalDate fentr;
+    
+    private String idPac;
+    private Date fVisita;
     
     public List<CtrlCollection> list = new LinkedList<>();
     
@@ -152,7 +157,7 @@ public class FXMLVisitasController implements Initializable {
         this.hdl.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) computeIA();
         });
-        this.list.add(new CtrlCollection("TG", CtrlType.TXT, this.trig,"50;600;0"));
+        this.list.add(new CtrlCollection("TG", CtrlType.TXT, this.trig,"20;600;0"));
 
         SFarm.setItems(trat);
     }
@@ -175,12 +180,17 @@ public class FXMLVisitasController implements Initializable {
             SFarm.getColumns().add(cumplCol);
                         
             if (this.edit) {
+                // original id values
+                this.idPac = id;
+                this.fVisita = fecha;
+                
                 ResultSet rs = d.getVisitasByIdFecha(id, fecha);
                 if (rs.next()) {
                     this.nom.setText(rs.getString("NOM"));
                     Long age = ChronoUnit.YEARS.between(rs.getDate("FNAC").toLocalDate(),fecha.toLocalDate());
                     this.edad.setText(age.toString().concat(" años"));
                     this.talla = rs.getDouble("TALLA");
+                    this.fentr = rs.getDate("FENTR").toLocalDate();
                     
                     String v;
                     for(CtrlCollection c : list){
@@ -301,9 +311,64 @@ public class FXMLVisitasController implements Initializable {
 
     @FXML
     private void ok(ActionEvent event) {
-        this.changed = true;
         
-        closeWindow();
+        // validate fields
+        String v;
+        Boolean ok = true;
+        for(CtrlCollection c : list){
+            switch (c.type) {
+            case TXT:
+                ok = ValidateNumber(c.oTxt, c.min, c.max, c.dec, c.field);
+                break;
+            case DATE:
+                if (c.oDate.getValue() == null) {
+                    ok = false;
+                    showError("La fecha de visita no puede quedar vacía", "Identificador vacío");
+                } else {
+                    LocalDate f = c.oDate.getValue();
+                    if (f.isBefore(fentr)) {
+                        ok = false;
+                        showError("La fecha de visita debe ser posterior a la fecha de entrada","Error de validación campo FECHA");
+                    }
+                }
+                if (!ok) c.oDate.requestFocus();
+                break;
+            case COMBO:
+                ok = CheckValueIsInList(c.oCombo, c.field);
+                break;
+            }
+            if (!ok) break;
+        }
+
+        if (ok) {
+            Date uFecha = java.sql.Date.valueOf(this.fecha.getValue());
+
+            if ((!this.edit) || (this.edit && !this.fVisita.equals(uFecha))) {
+                if (this.d.VisitaExists(this.idPac,uFecha)) {
+                    ok = false;
+                    showError("La fecha de visita ya existe.","Identificador duplicado");
+                }
+            }
+            if (ok) {
+                if (this.edit) {
+                    if (!this.fVisita.equals(uFecha)) {
+                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Ha cambiado la fecha de la visita.\n\n ¿Desea continuar?");
+                        confirm.setTitle("Confirmar");
+                        confirm.setHeaderText("Ha cambiado el identificador");
+                        Optional<ButtonType> result = confirm.showAndWait();
+                        ok = (result.get() == ButtonType.OK);
+                    }
+                    // if (ok) ok = this.d.updateCensal(this.identifier, this.list);
+                } else {
+                    // ok = this.d.addCensal(this.list);
+                }
+            }
+        }
+        
+        if (ok) {
+            this.changed = true;
+            closeWindow();
+        }
     }
     
     public void LoadFarmacos(String id, Date fecha) {
@@ -389,35 +454,40 @@ public class FXMLVisitasController implements Initializable {
         }
     }
     
-    public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec) {
-        Boolean ok = true;
+    public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec, String field) {
+        Integer error = 0;
         String c = o.getText();
         if (!c.trim().isEmpty()) {
             Double v = Double.parseDouble(c);
+            if (min != null) if (v < min) error = 1;
+            if (max != null) if (v > max) error = 2;
+            
             Integer nDec = c.indexOf('.') > 0 ? (c.length() - c.indexOf('.') - 1) : 0;
-            if (v < min | v > max) {
-                showError("El valor debe estar entre ".concat(min.toString()).concat(" y ").concat(max.toString()), "Error de validación");
+            if (dec!=null) if (nDec > dec) error = 3;
+        }
+        Boolean ok = (error == 0);
+        if (!ok) {
+            String header = "Error de validación campo " + field;
+            if (error==1) showError("El valor debe ser mayor o igual que ".concat(min.toString()), header);
+            if (error==2) showError("El valor debe ser menor o igual que ".concat(max.toString()), header);
+            if (error==3) showError("El número de decimales debe ser ".concat(dec.toString()), header);
+            o.requestFocus();
+        }
+        
+        return ok;
+    }
+    
+    public Boolean CheckValueIsInList(ComboBox o, String field) {
+        Boolean ok = true;
+        String c = o.getEditor().getText();
+        if (!c.trim().isEmpty()) {
+            if (!o.getItems().contains(c)) {
                 ok = false;
-            } else if (nDec > dec) {
-                showError("El número de decimales debe ser ".concat(dec.toString()), "Error de validación");
-                ok = false;
-            }
-            if (!ok) {
-                o.undo();
+                showError("El valor " + c + " no está en la lista", "Error de validación campo " + field);
                 o.requestFocus();
             }
         }
         return ok;
-    }
-    
-    public void CheckValueIsInList(ComboBox o) {
-        String c = o.getEditor().getText();
-        if (!c.trim().isEmpty()) {
-            if (!o.getItems().contains(c)) {
-                showError("El valor " + c + " no está en la lista", "Error de validación");
-                o.requestFocus();
-            }
-        }
     }
     
     private void closeWindow() {

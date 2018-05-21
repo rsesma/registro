@@ -5,7 +5,6 @@
  */
 package registro;
 
-import registro.model.CtrlType;
 import registro.model.CtrlCollection;
 import java.net.URL;
 import java.sql.ResultSet;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 
 import javafx.fxml.FXML;
@@ -26,8 +24,9 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import registro.model.Controles;
+import registro.model.Controles.TipoCtrl;
 import registro.model.getRegistroData;
 
 /**
@@ -80,6 +79,8 @@ public class FXMLCensalController implements Initializable {
     
     public List<CtrlCollection> list = new LinkedList<>();
     
+    private Controles c = new Controles();
+    
     /**
      * Initializes the controller class.
      * @param url
@@ -90,121 +91,43 @@ public class FXMLCensalController implements Initializable {
         // TODO
         this.changed = false;
         
-        this.list.add(new CtrlCollection("IDPAC", CtrlType.TXT, this.id,""));
-        this.list.add(new CtrlCollection("NSS", CtrlType.TXT, this.nss,""));
-        this.list.add(new CtrlCollection("NOMBRE", CtrlType.TXT, this.nom,""));
-        this.list.add(new CtrlCollection("APE1", CtrlType.TXT, this.ape1,""));
-        this.list.add(new CtrlCollection("APE2", CtrlType.TXT, this.ape2,""));
-        this.list.add(new CtrlCollection("DOMIC", CtrlType.TXT, this.domic,""));
-        this.list.add(new CtrlCollection("POBL", CtrlType.TXT, this.pobl,""));
-        this.list.add(new CtrlCollection("PROF", CtrlType.TXT, this.prof,""));
-        
-        this.cp.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation(5,false));
-        this.list.add(new CtrlCollection("CPOST", CtrlType.TXT, this.cp,""));
-        
-        this.talla.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation(4,true));
-        this.talla.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue) { // we only care about loosing focus
-                if (!this.talla.getText().trim().isEmpty()) {
-                    Double v = Double.parseDouble(this.talla.getText());
-                    if (v < 1.5 | v > 2.0) {
-                        Alert alert = new Alert(AlertType.ERROR, "La talla debe estar entre 1.5 y 2.0 metros");
-                        alert.setHeaderText("Error de validación");
-                        alert.showAndWait();
-                        this.talla.requestFocus();
-                    }                    
-                }
-            }
-        });
-        this.list.add(new CtrlCollection("TALLA", CtrlType.TXT, this.talla,""));
-        
-        this.telef.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation(9,false));
-        this.list.add(new CtrlCollection("TEL", CtrlType.TXT, this.telef,""));
-        
-        this.list.add(new CtrlCollection("FNAC", CtrlType.DATE, this.fnac,""));
-        this.list.add(new CtrlCollection("FENTR", CtrlType.DATE, this.fentr,""));
-        
-        this.list.add(new CtrlCollection("SEXO", CtrlType.RB, this.fem,"F"));
-        this.list.add(new CtrlCollection("SEXO", CtrlType.RB, this.masc,"M"));
-        
-        this.list.add(new CtrlCollection("NOTAS", CtrlType.MEMO, this.notes,""));
-    }
-
-    public EventHandler<KeyEvent> numeric_Validation(final Integer max_Lengh, final Boolean dec) {
-        return new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent e) {
-                TextField txt_TextField = (TextField) e.getSource();                
-                if (txt_TextField.getText().length() >= max_Lengh) {                    
-                    e.consume();
-                }
-                if (dec) {
-                    if(e.getCharacter().matches("[0-9.]")){ 
-                        if(txt_TextField.getText().contains(".") && e.getCharacter().matches("[.]")){
-                            e.consume();
-                        }else if(txt_TextField.getText().length() == 0 && e.getCharacter().matches("[.]")){
-                            e.consume(); 
-                        }
-                    }else{
-                        e.consume();
-                    }
-                } else {
-                    if(!e.getCharacter().matches("[0-9]")){ 
-                        e.consume();
-                    }
-                }
-            }
-        };
+        // load controles object with data controls
+        this.c.add("IDPAC", TipoCtrl.TXT, this.id,"3,n,0",true,false);
+        this.c.add("NSS", TipoCtrl.TXT, this.nss,"0,0",false,true);
+        this.c.add("NOMBRE", TipoCtrl.TXT, this.nom,"0,0",false,true);
+        this.c.add("APE1", TipoCtrl.TXT, this.ape1,"0,0",false,true);
+        this.c.add("APE2", TipoCtrl.TXT, this.ape2,"0,0",false,true);
+        this.c.add("DOMIC", TipoCtrl.TXT, this.domic,"0,0",false,true);
+        this.c.add("POBL", TipoCtrl.TXT, this.pobl,"0,0",false,true);
+        this.c.add("PROF", TipoCtrl.TXT, this.prof,"0,0",false,true);
+        this.c.add("CPOST", TipoCtrl.TXT, this.cp,"5,n,0",false,true);
+        this.c.add("TALLA", TipoCtrl.TXT, this.talla,"0,n,1.5;2;2",false,false);
+        this.c.add("TEL", TipoCtrl.TXT, this.telef,"9,n,0",false,true);
+        this.c.add("FNAC", TipoCtrl.DATE, this.fnac,"",false,false);
+        this.c.add("FENTR", TipoCtrl.DATE, this.fentr,"",false,false);        
+        this.c.add("SEXO", TipoCtrl.RB, this.fem,"F",false,true);
+        this.c.add("SEXO", TipoCtrl.RB, this.masc,"M",false,true);
+        this.c.add("NOTAS", TipoCtrl.MEMO, this.notes,"",false,true);
     }
 
     public void SetData(String idPac, Boolean lEdit, getRegistroData data) {
         this.edit = lEdit;
         this.d = data;
         
-        try {
-            if (this.edit) {
-                this.btExit.setDisable(false);
-                
-                String v;
-                ResultSet rs = this.d.getCensalRs(idPac);
-                if (rs.next()) {
-                    this.identifier = idPac;
-                    for(CtrlCollection c : list){
-                        switch (c.type) {
-                            case TXT:
-                                v = rs.getString(c.field);
-                                if (!rs.wasNull()) {
-                                    c.oTxt.setText(v); 
-                                }
-                                break;
-                            case MEMO:
-                                v = rs.getString(c.field);
-                                if (!rs.wasNull()) {
-                                    c.oMemo.setText(v);
-                                }
-                                break;
-                            case DATE:
-                                java.sql.Date fecha = rs.getDate(c.field);
-                                if (!rs.wasNull()) {
-                                    c.oDate.setValue(fecha.toLocalDate());
-                                }
-                                break;
-                            case RB:
-                                v = rs.getString(c.field);
-                                if (!rs.wasNull()) {
-                                    if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
-                                }
-                                break;
-                        }
-                    }
-                }
+        this.btExit.setDisable(true);
+
+        if (this.edit) {
+            this.btExit.setDisable(false);
+
+            this.identifier = idPac;
+            ResultSet rs;
+            try {
+                rs = this.d.getCensalRs(idPac);
+                this.c.loadData(rs);
                 rs.close();
+            } catch (Exception e) {
+                showMessage(e.getMessage(),"Error cargando los datos censales",AlertType.ERROR,"Error");
             }
-            else {
-                this.btExit.setDisable(true);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }    
     
@@ -212,36 +135,31 @@ public class FXMLCensalController implements Initializable {
     void pbAceptar(ActionEvent event) {
         
         if (this.id.getText().isEmpty()) {
-            Alert error = new Alert(Alert.AlertType.ERROR, "El identificador de paciente no puede quedar vacío.");
-            error.setTitle("Error");
-            error.setHeaderText("Identificador vacío");
-            error.showAndWait();
+            showMessage("El identificador de paciente no puede quedar vacío","Identificador vacío",AlertType.ERROR,"Error");
         } else {
-            if (this.d.CensalIdExists(this.id.getText())) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "El identificador de paciente ya existe.");
-                alert.setTitle("Atención");
-                alert.setHeaderText("Identificador duplicado");
-                alert.showAndWait();
+            Boolean idExists = this.d.CensalIdExists(this.id.getText());
+            Boolean idChanged = this.edit && !this.identifier.equalsIgnoreCase(this.id.getText());
+            if ((this.edit && idExists && idChanged) || (!this.edit && idExists)) {
+                showMessage("El identificador de paciente ya existe","Identificador duplicado",AlertType.WARNING,"Atención");
             } else {
                 Boolean ok = true;
-                if (this.edit) {
-                    if (!this.id.getText().equalsIgnoreCase(this.identifier)) {
-                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se aplicarán los cambios en todos los registros relacionados.\n\n ¿Desea continuar?");
-                        confirm.setTitle("Confirmar");
-                        confirm.setHeaderText("Ha cambiado el identificador");
-                        Optional<ButtonType> result = confirm.showAndWait();
-                        ok = (result.get() == ButtonType.OK);
-                    }
-
-                    if (ok) ok = this.d.updateCensal(this.identifier, this.list);
-                } else {
-                    ok = this.d.addCensal(this.list);
+                if (this.edit && idChanged) {
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se aplicarán los cambios en todos los registros relacionados.\n\n ¿Desea continuar?");
+                    confirm.setTitle("Confirmar");
+                    confirm.setHeaderText("Ha cambiado el identificador");
+                    Optional<ButtonType> result = confirm.showAndWait();
+                    ok = (result.get() == ButtonType.OK);
                 }
                 
                 if (ok) {
-                    this.changed = true;
-                    this.updatedID = this.id.getText();
-                    closeWindow();
+                    if (this.c.validateData()) {
+/*                        if (this.edit) this.d.updateCensal(this.identifier, this.list);
+                        else this.d.addCensal(this.list);
+                        
+                        this.changed = true;
+                        this.updatedID = this.id.getText();*/
+                        closeWindow();
+                    }
                 }
             }
         }
@@ -262,4 +180,10 @@ public class FXMLCensalController implements Initializable {
         stage.close();
     }    
 
+    public void showMessage(String message, String header, AlertType type, String title) {
+        Alert a = new Alert(type, message);
+        a.setTitle(title);
+        a.setHeaderText(header);
+        a.showAndWait();
+    }
 }

@@ -76,6 +76,23 @@ public class getRegistroData {
             return true;
         }
     }
+
+    public Boolean VisitaExists(String id, Date fecha) {
+        try {
+            PreparedStatement q = conn.prepareStatement("SELECT COUNT(IDPACV) AS N FROM Visitas WHERE IDPACV = ? AND FECHA = ?");
+            q.setString(1, id);
+            q.setDate(2, fecha);
+            ResultSet rs = q.executeQuery();
+            rs.next();
+            Integer count = rs.getInt("N");
+            rs.close();
+            return (count>0);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return true;
+        }
+    }
     
     public Boolean updateCensal(String id, List<CtrlCollection> list) {
         StringBuilder b = new StringBuilder();

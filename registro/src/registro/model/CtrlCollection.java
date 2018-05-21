@@ -29,6 +29,8 @@ public class CtrlCollection implements java.io.Serializable {
     public Double max;
     public Integer dec;
     public CtrlType type;
+    public Boolean numeric;
+    public String valid;
     
     public TextField oTxt;
     public DatePicker oDate;
@@ -36,44 +38,48 @@ public class CtrlCollection implements java.io.Serializable {
     public TextArea oMemo;
     public ComboBox oCombo;
     
-    public CtrlCollection(String name, CtrlType t, Object o, String c){
+    public CtrlCollection(String name, CtrlType t, Object o, String options){
         this.field = name;
         this.type = t;
-        
+                
         switch (this.type) {
             case TXT:
                 this.oTxt = (TextField) o;
-                if (!c.trim().isEmpty()) {
-                    this.min = Double.parseDouble(c.split(";")[0]);
-                    this.max = Double.parseDouble(c.split(";")[1]);
-                    this.dec = Integer.parseInt(c.split(";")[2]);
+                Boolean numeric = (options.split(",")[0]=="n");
+                if (this.numeric) {
+                    this.dec = 0;
+                    this.min = null;
+                    this.max = null;
+                    this.valid = "0123456789";
+                    
+                    // validate values
+                    String c = options.split(",")[1];
+                    if (!c.trim().isEmpty()) {
+                        this.min = Double.parseDouble(c.split(";")[0]);
+                        this.max = Double.parseDouble(c.split(";")[1]);
+                        this.dec = Integer.parseInt(c.split(";")[2]);
+                        if (this.dec>0) this.valid.concat(".");
+                    }
                     
                     // allow numeric input only
                     this.oTxt.setOnKeyTyped((KeyEvent e) -> { 
-                        if (this.dec==0) {
-                            if (!"0123456789".contains(e.getCharacter())) e.consume(); 
-                        } else {
-                            if (!"0123456789.".contains(e.getCharacter())) e.consume(); 
-                        }
+                        if (this.dec==0) if (!valid.contains(e.getCharacter())) e.consume(); 
                     });
-                } else {
-                    this.min = null;
-                    this.max = null;
-                    this.dec = null;
                 }
+                    
                 break;
             case DATE:
                 this.oDate = (DatePicker) o;
                 break;
             case COMBO:
                 this.oCombo = (ComboBox) o;
-                this.dic = c.split(";")[0];
-                this.cod = c.split(";")[1];
-                this.descrip = c.split(";")[2];
+                this.dic = options.split(";")[0];
+                this.cod = options.split(";")[1];
+                this.descrip = options.split(";")[2];
                 break;
             case RB:
                 this.oRB = (RadioButton) o;
-                this.value = c;
+                this.value = options;
                 break;
             case MEMO:
                 this.oMemo = (TextArea) o;
