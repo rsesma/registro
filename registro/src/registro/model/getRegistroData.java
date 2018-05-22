@@ -11,7 +11,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.time.LocalDate;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import registro.FXMLregistroController.Forms;
 
@@ -77,7 +78,8 @@ public class getRegistroData {
         }
     }
 
-    public Boolean VisitaExists(String id, Date fecha) {
+    public Boolean VisitaExists(String id, LocalDate f) {
+        Date fecha = java.sql.Date.valueOf(f);
         try {
             PreparedStatement q = conn.prepareStatement("SELECT COUNT(IDPACV) AS N FROM Visitas WHERE IDPACV = ? AND FECHA = ?");
             q.setString(1, id);
@@ -94,108 +96,38 @@ public class getRegistroData {
         }
     }
     
-    public Boolean updateCensal(String id, List<CtrlCollection> list) {
-        StringBuilder b = new StringBuilder();
-        b.append("UPDATE Censal \nSET \n");
-        for(CtrlCollection c : list){
-            switch (c.type) {
-                case TXT:
-                    if (c.oTxt.getText().isEmpty()) {
-                        b.append("  ").append(c.field).append(" = NULL, \n");
-                    } else {
-                        if (c.field.equalsIgnoreCase("IDPAC") || c.field.equalsIgnoreCase("TALLA")) {
-                            b.append("  ").append(c.field).append(" = ").append(c.oTxt.getText()).append(", \n");
-                        } else {
-                            b.append("  ").append(c.field).append(" = '").append(c.oTxt.getText()).append("', \n");
-                        }
-                    }
-                    break;
-                case MEMO:
-                    if (c.oMemo.getText() == null) {
-                        b.append("  ").append(c.field).append(" = NULL, \n");
-                    } else {
-                        b.append("  ").append(c.field).append(" = '").append(c.oMemo.getText()).append("', \n");
-                    }
-                    break;
-                case DATE:
-                    if (c.oDate.getValue() == null) {
-                        b.append("  ").append(c.field).append(" = NULL, \n");
-                    } else {
-                        Date date = Date.valueOf(c.oDate.getValue());
-                        b.append("  ").append(c.field).append(" = '").append(date.toString()).append("', \n");
-                    }
-                    break;
-                case RB:
-                    if (c.oRB.isSelected()) b.append("  ").append(c.field).append(" = '").append(c.value).append("', \n");
-                    break;
-            }
-        }
-        String sql = b.toString();
-        sql = sql.substring(0,sql.length()-3).concat("\n").concat("WHERE IDPAC = ").concat(id).concat(";");
-        
-        try {
-            conn.prepareStatement(sql).executeUpdate();
-            return true;
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
-            alert.showAndWait();
-            return false;
-        }
+    public Boolean update(String table, Controles c, String where) {
+        String sql = "UPDATE ".concat(table).concat(" SET \n");
+        sql = sql.concat(c.getUpdateSQL(this)).concat("\n");
+        sql = sql.concat("WHERE ").concat(where);
+        return executeSQL(sql,true);
     }
     
-    public Boolean addCensal(List<CtrlCollection> list) {
-        StringBuilder f = new StringBuilder();
-        StringBuilder v = new StringBuilder();
-        String SexoVal = "";
-        for(CtrlCollection c : list){
-            if (c.type!= CtrlType.RB) f.append(c.field).append(",");
-            switch (c.type) {
-                case TXT:
-                    if (c.oTxt.getText().isEmpty()) {
-                        v.append("NULL").append(",");
-                    } else {
-                        if (c.field.equalsIgnoreCase("IDPAC") || c.field.equalsIgnoreCase("TALLA")) {
-                            v.append(c.oTxt.getText()).append(",");
-                        } else {
-                            v.append("'").append(c.oTxt.getText()).append("',");
-                        }
-                    }
-                    break;
-                case MEMO:
-                    if (c.oMemo.getText() == null) {
-                        v.append("NULL").append(",");
-                    } else {
-                        v.append("'").append(c.oMemo.getText()).append("',");
-                    }
-                    break;
-                case DATE:
-                    if (c.oDate.getValue() == null) {
-                        v.append("NULL,");
-                    } else {
-                        Date date = Date.valueOf(c.oDate.getValue());
-                        v.append("'").append(date.toString()).append("',");
-                    }
-                    break;
-                case RB:
-                    if (c.oRB.isSelected()) SexoVal = c.value;
-                    break;
-            }
-        }
-        String fields = f.toString().concat("SEXO");
-        String values = v.toString().concat("'" + SexoVal + "'");
-        String sql = "INSERT INTO Censal\n  (".concat(fields).concat(") \n");
-        sql = sql.concat("  VALUES(").concat(values).concat(");");
-        
-        try {
-            conn.prepareStatement(sql).executeUpdate();
-            return true;
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
-            alert.showAndWait();
-            return false;
-        }
+    public Boolean add(String table, Controles c) {
+        String sql = "INSERT INTO ".concat(table);
+        sql = sql.concat("\n (").concat(c.getFieldsSQL()).concat(")");
+        sql = sql.concat("\n VALUES(").concat(c.getAddSQL(this)).concat(")");
+        return executeSQL(sql,true);
+    }
+
+    public Boolean delete(String table, String where) {
+        String sql = "DELETE FROM ".concat(table);
+        sql = sql.concat(" WHERE ").concat(where);
+        return executeSQL(sql,false);
     }
     
+    public Boolean executeSQL(String sql, Boolean update) {
+        try {
+            if (update) conn.prepareStatement(sql).executeUpdate();
+            else conn.prepareStatement(sql).execute();
+            return true;
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.showAndWait();
+            return false;
+        }        
+    }
+        
     public Boolean deleteCensalbyID(String id) {
         try {
             conn.prepareStatement("DELETE FROM Censal WHERE IDPAC = ".concat(id)).execute();
@@ -233,14 +165,19 @@ public class getRegistroData {
     }
     
     public String getDescripFromCod(String dic, String cod, Integer value, String descrip) throws SQLException {
-        String d = "";
         PreparedStatement q = conn.prepareStatement("SELECT * FROM " + dic + " WHERE " + cod + " = ?");
         q.setInt(1, value);
         ResultSet rs = q.executeQuery();
-        if (rs.next()) {
-            return rs.getString(descrip);
-        }
-        return d;
+        if (rs.next()) return rs.getString(descrip);
+        return "";
+    }
+    
+    public String getCodFromDescrip(String dic, String descrip, String value, String cod) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM " + dic + " WHERE " + descrip + " = ?");
+        q.setString(1, value);
+        ResultSet rs = q.executeQuery();
+        if (rs.next()) return rs.getString(cod);
+        return "";
     }
     
     public ResultSet getFarmacosByIdFecha(String id, Date fecha) throws SQLException {
@@ -248,6 +185,33 @@ public class getRegistroData {
         q.setString(1, id);
         q.setDate(2, fecha);
         return q.executeQuery();
+    }
+    
+    public void updateFarmacosByIdFecha(String id, Date fecha, ObservableList<Tratamiento> list) {
+        
+        try {
+            PreparedStatement q = conn.prepareStatement("DELETE FROM Farmacos WHERE IDPACF = ? AND FECHAF = ?");
+            q.setString(1, id);
+            q.setDate(2, fecha);
+            q.execute();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
+        if (!list.isEmpty()) {
+            list.forEach((t) -> { 
+                try {
+                    PreparedStatement q = conn.prepareStatement("INSERT INTO Farmacos (IDPACF, FECHAF, FARMAC, CUMPLI) VALUES(?,?,?,?)");
+                    q.setString(1, id);
+                    q.setDate(2, fecha);
+                    q.setString(3, t.getFarm());
+                    q.setString(4, t.getCumpl());
+                    q.executeUpdate();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            });
+        }
     }
     
     public ResultSet getFarmacById(String cod) throws SQLException {

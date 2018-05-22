@@ -89,11 +89,11 @@
       <Button layoutX="673.0" layoutY="375.0" mnemonicParsing="false" onAction="#editTratamiento" prefWidth="70.0" text="Editar" />
       <Button layoutX="673.0" layoutY="410.0" mnemonicParsing="false" onAction="#newTratamiento" prefWidth="70.0" text="Nuevo" />
       <Button layoutX="673.0" layoutY="446.0" mnemonicParsing="false" onAction="#delTratamiento" prefWidth="70.0" text="Eliminar" />
-      <Button layoutX="668.0" layoutY="577.0" mnemonicParsing="false" onAction="#ok" prefHeight="30.0" prefWidth="80.0" text="Aceptar">
+      <Button layoutX="668.0" layoutY="577.0" mnemonicParsing="false" onAction="#pbAceptar" prefHeight="30.0" prefWidth="80.0" text="Aceptar">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <Button cancelButton="true" layoutX="576.0" layoutY="577.0" mnemonicParsing="false" onAction="#cancel" prefHeight="30.0" prefWidth="80.0" text="Cancelar" />
+      <Button cancelButton="true" layoutX="576.0" layoutY="577.0" mnemonicParsing="false" onAction="#pbCancelar" prefHeight="30.0" prefWidth="80.0" text="Cancelar" />
    </children>
 </AnchorPane>

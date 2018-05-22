@@ -11,8 +11,6 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -33,9 +31,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.controlsfx.control.textfield.TextFields;
-import registro.model.CtrlCollection;
-import registro.model.CtrlType;
+import registro.model.Controles;
 import registro.model.Tratamiento;
 import registro.model.getRegistroData;
 
@@ -101,15 +97,17 @@ public class FXMLVisitasController implements Initializable {
 
     
     private Boolean edit;
-    private Boolean changed;
+    public Boolean changed = false;
     private getRegistroData d;
     private Double talla;
     private LocalDate fentr;
+    private LocalDate fnac;
+    private Boolean farmChanged = false;
+
+    public String idPac;
+    public Date fVisita;
     
-    private String idPac;
-    private Date fVisita;
-    
-    public List<CtrlCollection> list = new LinkedList<>();
+    private Controles c = new Controles();
     
     final ObservableList<Tratamiento> trat = FXCollections.observableArrayList();
     
@@ -121,43 +119,40 @@ public class FXMLVisitasController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        this.changed = false;
         
-        this.list.add(new CtrlCollection("IDPACV", CtrlType.TXT, this.id,""));
-        this.list.add(new CtrlCollection("FECHA", CtrlType.DATE, this.fecha,""));
-        
-        this.list.add(new CtrlCollection("PESO", CtrlType.TXT, this.peso,"20;200;1"));
+        this.c.add("IDPACV", Controles.TipoCtrl.TXT, this.id,"3,n,0",true,false);
+        this.c.add("FECHA", Controles.TipoCtrl.DATE, this.fecha,"",true,false);
+        this.fecha.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) computeEdad();
+        });
+        this.c.add("PESO", Controles.TipoCtrl.TXT, this.peso,"0,n,20;200;1",false,false);
         this.peso.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) computeIMC();
         });
-
-        this.list.add(new CtrlCollection("GLUC", CtrlType.TXT, this.gluc,"20;1200;0"));
-        this.list.add(new CtrlCollection("DIABET", CtrlType.COMBO, this.diab,"DSiNo;CODSN;DESCSN"));
-        this.list.add(new CtrlCollection("MENOP", CtrlType.COMBO, this.menop,"DSiNo;CODSN;DESCSN"));
-        
-        this.list.add(new CtrlCollection("HE", CtrlType.TXT, this.he,"0;60;0"));
-        this.list.add(new CtrlCollection("EJER", CtrlType.TXT, this.ejer,"0;50;0"));
-        this.list.add(new CtrlCollection("DIETA", CtrlType.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP"));
-        
-        this.list.add(new CtrlCollection("TABACO", CtrlType.TXT, this.tabaco,"0;80;0"));
-        this.list.add(new CtrlCollection("TIPOTA", CtrlType.COMBO, this.marca,"DTabaco;IDMARC;MARCA"));
+        this.c.add("GLUC", Controles.TipoCtrl.TXT, this.gluc,"0,n,20;1200;0",false,false);
+        this.c.add("DIABET", Controles.TipoCtrl.COMBO, this.diab,"DSiNo;CODSN;DESCSN",false,false);
+        this.c.add("MENOP", Controles.TipoCtrl.COMBO, this.menop,"DSiNo;CODSN;DESCSN",false,false);
+        this.c.add("HE", Controles.TipoCtrl.TXT, this.he,"0,n,0;60;0",false,false);
+        this.c.add("EJER", Controles.TipoCtrl.TXT, this.ejer,"0,n,0;50;0",false,false);
+        this.c.add("DIETA", Controles.TipoCtrl.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP",false,false);
+        this.c.add("TABACO", Controles.TipoCtrl.TXT, this.tabaco,"0,n,0;80;0",false,false);
+        this.c.add("TIPOTA", Controles.TipoCtrl.COMBO, this.marca,"DTabaco;IDMARC;MARCA",false,false);
         this.marca.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) loadMarcaTab();
         });
-        
-        this.list.add(new CtrlCollection("PULSO", CtrlType.TXT, this.pulso,"5;300;0"));
-        this.list.add(new CtrlCollection("TAMAX", CtrlType.TXT, this.pas,"50;200;0"));
-        this.list.add(new CtrlCollection("TAMIN", CtrlType.TXT, this.pad,"50;150;0"));
-        this.list.add(new CtrlCollection("CT", CtrlType.TXT, this.ct,"50;300;0"));
+        this.c.add("PULSO", Controles.TipoCtrl.TXT, this.pulso,"0,n,5;300;0",false,false);
+        this.c.add("TAMAX", Controles.TipoCtrl.TXT, this.pas,"0,n,50;200;0",false,false);
+        this.c.add("TAMIN", Controles.TipoCtrl.TXT, this.pad,"0,n,50;150;0",false,false);
+        this.c.add("CT", Controles.TipoCtrl.TXT, this.ct,"0,n,50;300;0",false,false);
         this.ct.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) computeIA();
         });
-        this.list.add(new CtrlCollection("CLDL", CtrlType.TXT, this.ldl,"50;300;0"));
-        this.list.add(new CtrlCollection("CHDL", CtrlType.TXT, this.hdl,"20;200;0"));
+        this.c.add("CLDL", Controles.TipoCtrl.TXT, this.ldl,"0,n,50;300;0",false,false);
+        this.c.add("CHDL", Controles.TipoCtrl.TXT, this.hdl,"0,n,20;200;0",false,false);
         this.hdl.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) computeIA();
         });
-        this.list.add(new CtrlCollection("TG", CtrlType.TXT, this.trig,"20;600;0"));
+        this.c.add("TG", Controles.TipoCtrl.TXT, this.trig,"0,n,20;600;0",false,false);
 
         SFarm.setItems(trat);
     }
@@ -178,62 +173,36 @@ public class FXMLVisitasController implements Initializable {
             
             SFarm.getColumns().add(farmCol);
             SFarm.getColumns().add(cumplCol);
-                        
+            
+            // original id values
+            this.idPac = id;
+            this.fVisita = fecha;
+
+            ResultSet rsC = this.d.getCensalRs(id);
+            if (rsC.next()) {
+                this.nom.setText(rsC.getString("NOMBRE") + " " + rsC.getString("APE1") + " " + rsC.getString("APE2"));
+                this.talla = rsC.getDouble("TALLA");
+                this.fentr = rsC.getDate("FENTR").toLocalDate();
+                this.fnac = rsC.getDate("fnac").toLocalDate();
+            }
+            rsC.close();
+            
             if (this.edit) {
-                // original id values
-                this.idPac = id;
-                this.fVisita = fecha;
+                ResultSet rs = this.d.getVisitasByIdFecha(id, fecha);
+                this.c.loadData(rs, this.d);
+
+                rs.close();
                 
-                ResultSet rs = d.getVisitasByIdFecha(id, fecha);
-                if (rs.next()) {
-                    this.nom.setText(rs.getString("NOM"));
-                    Long age = ChronoUnit.YEARS.between(rs.getDate("FNAC").toLocalDate(),fecha.toLocalDate());
-                    this.edad.setText(age.toString().concat(" años"));
-                    this.talla = rs.getDouble("TALLA");
-                    this.fentr = rs.getDate("FENTR").toLocalDate();
-                    
-                    String v;
-                    for(CtrlCollection c : list){
-                        switch (c.type) {
-                            case TXT:
-                                v = rs.getString(c.field);
-                                if (!rs.wasNull()) {
-                                    c.oTxt.setText(v);
-                                }
-                                break;
-                            case DATE:
-                                java.sql.Date f = rs.getDate(c.field);
-                                if (!rs.wasNull()) {
-                                    c.oDate.setValue(f.toLocalDate());
-                                }
-                                break;
-                            case COMBO:
-                                try {
-                                    ResultSet rsDic = d.getDic(c.dic);
-                                    while (rsDic.next()) {
-                                        c.oCombo.getItems().add(rsDic.getString(c.descrip));
-                                    }
-                                    rsDic.close();
-                                    
-                                    Integer val = rs.getInt(c.field);
-                                    if (!rs.wasNull()) {
-                                        c.oCombo.setValue(d.getDescripFromCod(c.dic, c.cod, val, c.descrip));
-                                    }
-                                    
-                                    TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
-                                } catch (Exception e) {
-                                    showError(e.getMessage(),"Error obteniendo diccionario");
-                                }
-                                break;
-                        }
-                    }
-                    
-                    computeIMC();
-                    computeIA();
-                    loadMarcaTab();
-                    
-                    LoadFarmacos(rs.getString("IDPACV"),rs.getDate("FECHA"));
-                }
+                computeEdad();
+                computeIMC();
+                computeIA();
+                loadMarcaTab();
+                
+                LoadFarmacos(rs.getString("IDPACV"),rs.getDate("FECHA"));
+            } else {
+                this.id.setText(this.idPac);
+                this.edad.setText("");
+                this.c.loadData(null, this.d);
             }
         } catch (Exception e) {
             showError(e.getMessage(),"Error obteniendo visita");
@@ -275,6 +244,8 @@ public class FXMLVisitasController implements Initializable {
             stage.showAndWait();
 
             if (farm.changed) {
+                this.farmChanged = true;
+                
                 // edited item to update
                 Tratamiento edited = new Tratamiento(farm.farm, farm.descFarm, farm.cumpl, farm.descCumpl);
 
@@ -294,6 +265,7 @@ public class FXMLVisitasController implements Initializable {
         if (!this.trat.isEmpty()) {
             Tratamiento t = SFarm.getSelectionModel().getSelectedItem();
             if (t != null) {
+                this.farmChanged = true;
                 this.trat.remove(t);
             } else {
                 Alert wf = new Alert(Alert.AlertType.WARNING, "Seleccione el fármaco a eliminar");
@@ -305,69 +277,65 @@ public class FXMLVisitasController implements Initializable {
     }
 
     @FXML
-    private void cancel(ActionEvent event) {
+    private void pbCancelar(ActionEvent event) {
         closeWindow();
     }
 
     @FXML
-    private void ok(ActionEvent event) {
+    private void pbAceptar(ActionEvent event) {
         
-        // validate fields
-        String v;
-        Boolean ok = true;
-        for(CtrlCollection c : list){
-            switch (c.type) {
-            case TXT:
-                ok = ValidateNumber(c.oTxt, c.min, c.max, c.dec, c.field);
-                break;
-            case DATE:
-                if (c.oDate.getValue() == null) {
+        // check identifier is right
+        LocalDate f = this.fecha.getValue();
+        if (f == null) {
+            showError("La fecha de visita no puede quedar vacía", "Identificador vacío");
+            this.fecha.requestFocus();
+        } else if (!this.edit && this.d.VisitaExists(this.idPac,f)) {
+            showError("La fecha de visita ya existe", "Identificador duplicado");
+            this.fecha.requestFocus();
+        } else if (this.edit && !this.fVisita.equals(java.sql.Date.valueOf(f)) && this.d.VisitaExists(this.idPac,f)) {
+            showError("La fecha de visita ya existe", "Identificador duplicado");
+            this.fecha.requestFocus();
+        } else if (f.isBefore(fentr)) {
+            showError("La fecha de visita debe ser posterior a la fecha de entrada", "Error de validación campo FECHA");
+            this.fecha.requestFocus();
+        } else {
+            // validate fields
+            Boolean ok = (this.c.validateData());
+            
+            // postval pas/pad
+            if (!this.pas.getText().trim().isEmpty() && !this.pad.getText().trim().isEmpty()) {
+                Integer sis = Integer.parseInt(this.pas.getText());
+                Integer dia = Integer.parseInt(this.pad.getText());
+                if (dia >= sis) {
                     ok = false;
-                    showError("La fecha de visita no puede quedar vacía", "Identificador vacío");
-                } else {
-                    LocalDate f = c.oDate.getValue();
-                    if (f.isBefore(fentr)) {
-                        ok = false;
-                        showError("La fecha de visita debe ser posterior a la fecha de entrada","Error de validación campo FECHA");
-                    }
-                }
-                if (!ok) c.oDate.requestFocus();
-                break;
-            case COMBO:
-                ok = CheckValueIsInList(c.oCombo, c.field);
-                break;
-            }
-            if (!ok) break;
-        }
-
-        if (ok) {
-            Date uFecha = java.sql.Date.valueOf(this.fecha.getValue());
-
-            if ((!this.edit) || (this.edit && !this.fVisita.equals(uFecha))) {
-                if (this.d.VisitaExists(this.idPac,uFecha)) {
-                    ok = false;
-                    showError("La fecha de visita ya existe.","Identificador duplicado");
+                    showError("La presión arterial sistólica debe ser mayor que la diastólica", "Error de validación");
+                    this.pas.requestFocus();
                 }
             }
+            
             if (ok) {
-                if (this.edit) {
-                    if (!this.fVisita.equals(uFecha)) {
-                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Ha cambiado la fecha de la visita.\n\n ¿Desea continuar?");
-                        confirm.setTitle("Confirmar");
-                        confirm.setHeaderText("Ha cambiado el identificador");
-                        Optional<ButtonType> result = confirm.showAndWait();
-                        ok = (result.get() == ButtonType.OK);
-                    }
-                    // if (ok) ok = this.d.updateCensal(this.identifier, this.list);
-                } else {
-                    // ok = this.d.addCensal(this.list);
+                if (this.edit && !this.fVisita.equals(java.sql.Date.valueOf(f))) {
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Ha cambiado la fecha de la visita.\n\n ¿Desea continuar?");
+                    confirm.setTitle("Confirmar");
+                    confirm.setHeaderText("Ha cambiado el identificador");
+                    Optional<ButtonType> result = confirm.showAndWait();
+                    ok = (result.get() == ButtonType.OK);
                 }
+                
+                // update or add Visitas row
+                String where = "IDPACV = ".concat(this.idPac);
+                where = where.concat(" AND FECHA = '".concat(this.fVisita.toString())).concat("'");
+                if (this.edit) this.d.update("Visitas",this.c,where);
+                else this.d.add("Visitas",this.c);
+
+                this.changed = true;
+                this.fVisita = java.sql.Date.valueOf(f);
+                
+                // update Farmacos
+                if (this.farmChanged) this.d.updateFarmacosByIdFecha(this.idPac, this.fVisita, trat);
+                
+                closeWindow();
             }
-        }
-        
-        if (ok) {
-            this.changed = true;
-            closeWindow();
         }
     }
     
@@ -412,6 +380,15 @@ public class FXMLVisitasController implements Initializable {
         }
     }
     
+    public void computeEdad() {
+        if (this.fecha.getValue()!=null) {
+            Long age = ChronoUnit.YEARS.between(this.fnac,this.fecha.getValue());
+            this.edad.setText(age.toString().concat(" años"));
+        } else {
+            this.edad.setText("");
+        }
+    }
+    
     public void loadMarcaTab() {
         if (this.marca.getValue() != null) {
             String c = this.marca.getEditor().getText();
@@ -452,42 +429,6 @@ public class FXMLVisitasController implements Initializable {
             SFarm.getSelectionModel().selectFirst();
             SFarm.scrollTo(1);
         }
-    }
-    
-    public Boolean ValidateNumber(TextField o, Double min, Double max, Integer dec, String field) {
-        Integer error = 0;
-        String c = o.getText();
-        if (!c.trim().isEmpty()) {
-            Double v = Double.parseDouble(c);
-            if (min != null) if (v < min) error = 1;
-            if (max != null) if (v > max) error = 2;
-            
-            Integer nDec = c.indexOf('.') > 0 ? (c.length() - c.indexOf('.') - 1) : 0;
-            if (dec!=null) if (nDec > dec) error = 3;
-        }
-        Boolean ok = (error == 0);
-        if (!ok) {
-            String header = "Error de validación campo " + field;
-            if (error==1) showError("El valor debe ser mayor o igual que ".concat(min.toString()), header);
-            if (error==2) showError("El valor debe ser menor o igual que ".concat(max.toString()), header);
-            if (error==3) showError("El número de decimales debe ser ".concat(dec.toString()), header);
-            o.requestFocus();
-        }
-        
-        return ok;
-    }
-    
-    public Boolean CheckValueIsInList(ComboBox o, String field) {
-        Boolean ok = true;
-        String c = o.getEditor().getText();
-        if (!c.trim().isEmpty()) {
-            if (!o.getItems().contains(c)) {
-                ok = false;
-                showError("El valor " + c + " no está en la lista", "Error de validación campo " + field);
-                o.requestFocus();
-            }
-        }
-        return ok;
     }
     
     private void closeWindow() {

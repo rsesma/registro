@@ -18,6 +18,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import org.controlsfx.control.textfield.TextFields;
 
 /**
  *
@@ -37,29 +38,56 @@ public class Controles {
         this.list.add(new Control(field, t, o, options, isid, varchar));
     }
     
-    public void loadData(ResultSet rs) throws SQLException {
+    public void loadData(ResultSet rs, getRegistroData d) throws SQLException {
         String v;
         if (rs.next()) {
             for(Control c : list){
-                switch (c.type) {
-                    case TXT:
-                    case MEMO:
-                        v = rs.getString(c.field);
-                        if (!rs.wasNull()) c.oTxt.setText(v); 
-                        break;
-                    case DATE:
-                        java.sql.Date fecha = rs.getDate(c.field);
-                        if (!rs.wasNull()) c.oDate.setValue(fecha.toLocalDate());
-                        break;
-                    case RB:
-                        v = rs.getString(c.field);
-                        if (!rs.wasNull()) if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
-                        break;
+                if (rs!=null) {
+                    switch (c.type) {
+                        case TXT:
+                        case MEMO:
+                            v = rs.getString(c.field);
+                            if (!rs.wasNull()) c.oTxt.setText(v); 
+                            break;
+                        case DATE:
+                            java.sql.Date fecha = rs.getDate(c.field);
+                            if (!rs.wasNull()) c.oDate.setValue(fecha.toLocalDate());
+                            break;
+                        case COMBO:
+                            // load combo list
+                            ResultSet rsDic = d.getDic(c.dic);
+                            while (rsDic.next()) {
+                                c.oCombo.getItems().add(rsDic.getString(c.descrip));
+                            }
+                            rsDic.close();
+
+                            // set item value
+                            Integer val = rs.getInt(c.field);
+                            if (!rs.wasNull()) c.oCombo.setValue(d.getDescripFromCod(c.dic, c.cod, val, c.descrip));
+                            TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
+
+                            break;
+                        case RB:
+                            v = rs.getString(c.field);
+                            if (!rs.wasNull()) if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
+                            break;
+                    }
+                } else {
+                    // load combo list
+                    if (c.type == TipoCtrl.COMBO) {
+                        // load combo list
+                        ResultSet rsDic = d.getDic(c.dic);
+                        while (rsDic.next()) {
+                            c.oCombo.getItems().add(rsDic.getString(c.descrip));
+                        }
+                        rsDic.close();
+                        TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
+                    }
                 }
             }
         }
     }
-    
+
     public Boolean validateData() {
         Boolean ok = true;
 
@@ -69,6 +97,10 @@ public class Controles {
                     ok = c.validateText();
                     if (!ok) c.oTxt.requestFocus();
                     break;
+                case COMBO:
+                    ok = c.CheckValueIsInList();
+                    if (!ok) c.oCombo.requestFocus();
+                    break;
             }
             
             if (!ok) break;
@@ -76,6 +108,40 @@ public class Controles {
         
         return ok;
     }
+    
+    public String getUpdateSQL(getRegistroData d) {
+        StringBuilder b = new StringBuilder();
+        for(Control c : list){
+            if (c.type!=TipoCtrl.RB || (c.type==TipoCtrl.RB && c.oRB.isSelected())) {
+                if (b.length() > 0) b.append(", \n");
+                b.append("  ").append(c.field).append(" = ").append(c.getValue(d));
+            }
+        }
+        return b.toString();
+    }
+
+    public String getAddSQL(getRegistroData d) {
+        StringBuilder b = new StringBuilder();
+        for(Control c : list){
+            if (c.type!=TipoCtrl.RB || (c.type==TipoCtrl.RB && c.oRB.isSelected())) {
+                if (b.length() > 0) b.append(", ");
+                b.append(c.getValue(d));
+            }
+        }
+        return b.toString();
+    }
+
+    public String getFieldsSQL() {
+        StringBuilder b = new StringBuilder();
+        for(Control c : list){
+            if (c.type!=TipoCtrl.RB || (c.type==TipoCtrl.RB && c.oRB.isSelected())) {
+                if (b.length() > 0) b.append(", ");
+                b.append(c.field);
+            }
+        }
+        return b.toString();
+    }
+
     
     public class Control {
         public String field;
@@ -180,7 +246,20 @@ public class Controles {
             return ok;
         }
         
-        public String getValue() {
+        public Boolean CheckValueIsInList() {
+            Boolean ok = true;
+            String c = this.oCombo.getEditor().getText();
+            if (!c.trim().isEmpty()) {
+                if (!this.oCombo.getItems().contains(c)) {
+                    ok = false;
+                    showMessage("El valor ".concat(c).concat(" no está en la lista"), "Error de validación campo ".concat(this.field), AlertType.WARNING, "Atención");
+                }
+            }
+            return ok;
+        }
+
+        
+        public String getValue(getRegistroData d) {
             String c = "";
             
             switch (this.type) {
@@ -189,11 +268,11 @@ public class Controles {
                         c = "NULL";
                     } else {
                         c = this.oTxt.getText();
-                        if (!this.varchar) c = "'".concat(c).concat("'");
+                        if (this.varchar) c = "'".concat(c).concat("'");
                     }
                     break;
                 case MEMO:
-                    if (this.oMemo.getText() == null) c = "NULL";
+                    if (this.oMemo.getText() == null || this.oMemo.getText().trim().isEmpty()) c = "NULL";
                     else c = "'".concat(this.oMemo.getText()).concat("'");
                     break;
                 case DATE:
@@ -202,6 +281,18 @@ public class Controles {
                     } else {
                         Date date = Date.valueOf(this.oDate.getValue());
                         c = "'".concat(date.toString()).concat("'");
+                    }
+                    break;
+                case COMBO:
+                    if (this.oCombo.getSelectionModel().isEmpty()) {
+                        c = "NULL";
+                    } else {
+                        String val = this.oCombo.getSelectionModel().getSelectedItem().toString();
+                        try {
+                            c = d.getCodFromDescrip(this.dic,this.descrip,val,this.cod);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
                     }
                     break;
                 case RB:

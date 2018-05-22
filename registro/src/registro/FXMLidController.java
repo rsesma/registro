@@ -158,7 +158,7 @@ public class FXMLidController implements Initializable {
             Optional<ButtonType> result = confirm.showAndWait();
             if (result.get() == ButtonType.OK) {
                 try {
-                    if (this.d.deleteCensalbyID(p.getId())) {
+                    if (this.d.delete("Censal","IDPAC = ".concat(p.getId()))) {
                         listaData.remove(p);
                         count--;
                         total.setText(count + " paciente(s)");
@@ -197,6 +197,9 @@ public class FXMLidController implements Initializable {
                     // add new item
                     this.listaData.add(edited);
                     SortAndSelect(edited);
+                    
+                    count++;
+                    total.setText(count + " paciente(s)");
                 }
             }
         } catch (Exception e) {

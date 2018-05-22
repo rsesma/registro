@@ -5,11 +5,8 @@
  */
 package registro;
 
-import registro.model.CtrlCollection;
 import java.net.URL;
 import java.sql.ResultSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -77,8 +74,6 @@ public class FXMLCensalController implements Initializable {
     
     public getRegistroData d;
     
-    public List<CtrlCollection> list = new LinkedList<>();
-    
     private Controles c = new Controles();
     
     /**
@@ -123,7 +118,7 @@ public class FXMLCensalController implements Initializable {
             ResultSet rs;
             try {
                 rs = this.d.getCensalRs(idPac);
-                this.c.loadData(rs);
+                this.c.loadData(rs, this.d);
                 rs.close();
             } catch (Exception e) {
                 showMessage(e.getMessage(),"Error cargando los datos censales",AlertType.ERROR,"Error");
@@ -153,11 +148,11 @@ public class FXMLCensalController implements Initializable {
                 
                 if (ok) {
                     if (this.c.validateData()) {
-/*                        if (this.edit) this.d.updateCensal(this.identifier, this.list);
-                        else this.d.addCensal(this.list);
+                        if (this.edit) this.d.update("Censal",this.c,"IDPAC = ".concat(this.identifier));
+                        else this.d.add("Censal",this.c);
                         
                         this.changed = true;
-                        this.updatedID = this.id.getText();*/
+                        this.updatedID = this.id.getText();
                         closeWindow();
                     }
                 }
