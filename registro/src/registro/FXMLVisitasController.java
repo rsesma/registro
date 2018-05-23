@@ -102,6 +102,7 @@ public class FXMLVisitasController implements Initializable {
     private Double talla;
     private LocalDate fentr;
     private LocalDate fnac;
+    private String sexo;
     private Boolean farmChanged = false;
 
     public String idPac;
@@ -136,6 +137,9 @@ public class FXMLVisitasController implements Initializable {
         this.c.add("EJER", Controles.TipoCtrl.TXT, this.ejer,"0,n,0;50;0",false,false);
         this.c.add("DIETA", Controles.TipoCtrl.COMBO, this.dieta,"DCumpl;CODCMP;DESCMP",false,false);
         this.c.add("TABACO", Controles.TipoCtrl.TXT, this.tabaco,"0,n,0;80;0",false,false);
+        this.tabaco.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) Saltos();
+        });        
         this.c.add("TIPOTA", Controles.TipoCtrl.COMBO, this.marca,"DTabaco;IDMARC;MARCA",false,false);
         this.marca.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue) loadMarcaTab();
@@ -183,16 +187,16 @@ public class FXMLVisitasController implements Initializable {
                 this.nom.setText(rsC.getString("NOMBRE") + " " + rsC.getString("APE1") + " " + rsC.getString("APE2"));
                 this.talla = rsC.getDouble("TALLA");
                 this.fentr = rsC.getDate("FENTR").toLocalDate();
-                this.fnac = rsC.getDate("fnac").toLocalDate();
+                this.fnac = rsC.getDate("FNAC").toLocalDate();
+                this.sexo = rsC.getString("SEXO");
             }
             rsC.close();
+
+            ResultSet rs = this.d.getVisitasByIdFecha(id, fecha);
+            this.c.loadData(rs, this.d);
+            rs.close();
             
             if (this.edit) {
-                ResultSet rs = this.d.getVisitasByIdFecha(id, fecha);
-                this.c.loadData(rs, this.d);
-
-                rs.close();
-                
                 computeEdad();
                 computeIMC();
                 computeIA();
@@ -202,10 +206,30 @@ public class FXMLVisitasController implements Initializable {
             } else {
                 this.id.setText(this.idPac);
                 this.edad.setText("");
-                this.c.loadData(null, this.d);
             }
+            
+            Saltos();
         } catch (Exception e) {
             showError(e.getMessage(),"Error obteniendo visita");
+        }
+    }
+    
+    @FXML
+    private void editMarca(ActionEvent event) {
+        try {
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL); 
+            FXMLLoader fxml = new FXMLLoader(getClass().getResource("FXMLmarcaTab.fxml")); 
+            Parent rMarca = (Parent) fxml.load(); 
+            stage.setTitle("Marcas de tabaco");
+            stage.setScene(new Scene(rMarca));
+            FXMLmarcaTabController marca = fxml.<FXMLmarcaTabController>getController();
+            marca.SetData(this.d);
+            
+            stage.showAndWait();
+            
+        } catch (Exception e) {
+            showError(e.getMessage(),"Error abriendo la ventana");
         }
     }
     
@@ -323,19 +347,44 @@ public class FXMLVisitasController implements Initializable {
                 }
                 
                 // update or add Visitas row
-                String where = "IDPACV = ".concat(this.idPac);
-                where = where.concat(" AND FECHA = '".concat(this.fVisita.toString())).concat("'");
-                if (this.edit) this.d.update("Visitas",this.c,where);
-                else this.d.add("Visitas",this.c);
+                if (this.edit) {
+                    if (ok) {
+                        String where = "IDPACV = ".concat(this.idPac);
+                        where = where.concat(" AND FECHA = '".concat(this.fVisita.toString())).concat("'");
+                        this.d.update("Visitas",this.c,where);
+                    }
+                } else {
+                    this.d.add("Visitas",this.c);
+                }
 
-                this.changed = true;
-                this.fVisita = java.sql.Date.valueOf(f);
-                
-                // update Farmacos
-                if (this.farmChanged) this.d.updateFarmacosByIdFecha(this.idPac, this.fVisita, trat);
-                
-                closeWindow();
+                if (ok) {
+                    this.changed = true;
+                    this.fVisita = java.sql.Date.valueOf(this.fecha.getValue());
+
+                    // update Farmacos
+                    if (this.farmChanged) this.d.updateFarmacosByIdFecha(this.idPac, this.fVisita, trat);
+
+                    closeWindow();
+                }
             }
+        }
+    }
+    
+    public void Saltos() {
+        // menopausia desactivada en hombres
+        if (this.sexo.equals("M")) {
+            this.menop.setValue(null);
+            this.menop.setDisable(true);
+        } else {
+            this.menop.setDisable(false);
+        }
+        
+        // marca de tabaco desactivada en no fumadores
+        if (this.tabaco.getText().trim().isEmpty() || Integer.parseInt(this.tabaco.getText())==0) {
+            this.marca.setValue(null);
+            this.marca.setDisable(true);
+        } else {
+            this.marca.setDisable(false);
         }
     }
     

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="432.0" prefWidth="543.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLmarcaTabController">
+   <children>
+      <TableView fx:id="table" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="361.0" prefWidth="511.0">
+        <columns>
+          <TableColumn fx:id="codCol" prefWidth="58.0" text="Código" />
+          <TableColumn fx:id="marcaCol" prefWidth="240.0" text="Marca" />
+            <TableColumn fx:id="alquitCol" minWidth="1.0" prefWidth="66.0" sortable="false" text="Alquitrán" />
+            <TableColumn fx:id="nicCol" prefWidth="63.0" sortable="false" text="Nicotina" />
+            <TableColumn fx:id="coCol" prefWidth="49.0" text="CO" />
+        </columns>
+      </TableView>
+      <TextField fx:id="cod" layoutX="14.0" layoutY="384.0" prefHeight="27.0" prefWidth="60.0" promptText="Código" />
+      <TextField fx:id="marca" layoutX="82.0" layoutY="384.0" prefHeight="27.0" prefWidth="199.0" promptText="Marca" />
+      <TextField fx:id="alq" layoutX="290.0" layoutY="384.0" prefHeight="27.0" prefWidth="50.0" promptText="Alquitrán" />
+      <TextField fx:id="nic" layoutX="349.0" layoutY="384.0" prefHeight="27.0" prefWidth="50.0" promptText="Nicotina" />
+      <TextField fx:id="co" layoutX="407.0" layoutY="384.0" prefHeight="27.0" prefWidth="50.0" promptText="CO" />
+      <Button layoutX="465.0" layoutY="384.0" mnemonicParsing="false" onAction="#addMarca" text="+" />
+      <Button layoutX="500.0" layoutY="384.0" mnemonicParsing="false" onAction="#delMarca" text="-" />
+   </children>
+</AnchorPane>

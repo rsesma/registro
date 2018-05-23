@@ -41,53 +41,45 @@ public class Controles {
     public void loadData(ResultSet rs, getRegistroData d) throws SQLException {
         String v;
         if (rs.next()) {
+            //  load data from the ResultSet
             for(Control c : list){
-                if (rs!=null) {
-                    switch (c.type) {
-                        case TXT:
-                        case MEMO:
-                            v = rs.getString(c.field);
-                            if (!rs.wasNull()) c.oTxt.setText(v); 
-                            break;
-                        case DATE:
-                            java.sql.Date fecha = rs.getDate(c.field);
-                            if (!rs.wasNull()) c.oDate.setValue(fecha.toLocalDate());
-                            break;
-                        case COMBO:
-                            // load combo list
-                            ResultSet rsDic = d.getDic(c.dic);
-                            while (rsDic.next()) {
-                                c.oCombo.getItems().add(rsDic.getString(c.descrip));
-                            }
-                            rsDic.close();
-
-                            // set item value
-                            Integer val = rs.getInt(c.field);
-                            if (!rs.wasNull()) c.oCombo.setValue(d.getDescripFromCod(c.dic, c.cod, val, c.descrip));
-                            TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
-
-                            break;
-                        case RB:
-                            v = rs.getString(c.field);
-                            if (!rs.wasNull()) if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
-                            break;
-                    }
-                } else {
-                    // load combo list
-                    if (c.type == TipoCtrl.COMBO) {
-                        // load combo list
-                        ResultSet rsDic = d.getDic(c.dic);
-                        while (rsDic.next()) {
-                            c.oCombo.getItems().add(rsDic.getString(c.descrip));
-                        }
-                        rsDic.close();
-                        TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
-                    }
+                switch (c.type) {
+                    case TXT:
+                    case MEMO:
+                        v = rs.getString(c.field);
+                        if (!rs.wasNull()) c.oTxt.setText(v); 
+                        break;
+                    case DATE:
+                        java.sql.Date fecha = rs.getDate(c.field);
+                        if (!rs.wasNull()) c.oDate.setValue(fecha.toLocalDate());
+                        break;
+                    case COMBO:
+                        loadComboList(c,d);
+                        if (!rs.wasNull()) c.oCombo.setValue(d.getDescripFromCod(c.dic, c.cod, rs.getInt(c.field), c.descrip));
+                        break;
+                    case RB:
+                        v = rs.getString(c.field);
+                        if (!rs.wasNull()) if (v.equalsIgnoreCase(c.value)) c.oRB.setSelected(true);
+                        break;
                 }
+            }
+        } else {
+            // there is no ResultSet, load combos
+            for(Control c : list){
+                if (c.type == TipoCtrl.COMBO) loadComboList(c,d);
             }
         }
     }
-
+    
+    public void loadComboList(Control c, getRegistroData d) throws SQLException {
+        ResultSet rs = d.getDic(c.dic);
+        while (rs.next()) {
+            c.oCombo.getItems().add(rs.getString(c.descrip));
+        }
+        rs.close();
+        TextFields.bindAutoCompletion(c.oCombo.getEditor(), c.oCombo.getItems());
+    }
+    
     public Boolean validateData() {
         Boolean ok = true;
 

@@ -187,6 +187,81 @@ public class getRegistroData {
         return q.executeQuery();
     }
     
+    public Boolean ExisteCodMarcaTab(String cod) {
+        try {
+            PreparedStatement q = conn.prepareStatement("SELECT COUNT(IDMARC) AS N FROM DTabaco WHERE IDMARC = ?");
+            q.setString(1, cod);
+            ResultSet rs = q.executeQuery();
+            rs.next();
+            Integer count = rs.getInt("N");
+            rs.close();
+            return (count>0);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return true;
+        }
+    }
+
+    public Boolean ExisteMarcaTab(String marca) {
+        try {
+            PreparedStatement q = conn.prepareStatement("SELECT COUNT(IDMARC) AS N FROM DTabaco WHERE MARCA = ?");
+            q.setString(1, marca);
+            ResultSet rs = q.executeQuery();
+            rs.next();
+            Integer count = rs.getInt("N");
+            rs.close();
+            return (count>0);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return true;
+        }
+    }
+
+    public Boolean MarcaTabEnUso(String cod) {
+        try {
+            PreparedStatement q = conn.prepareStatement("SELECT COUNT(IDPACV) AS N FROM Visitas WHERE TIPOTA = ?");
+            q.setString(1, cod);
+            ResultSet rs = q.executeQuery();
+            rs.next();
+            Integer count = rs.getInt("N");
+            rs.close();
+            return (count>0);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return true;
+        }
+    }
+    
+    public void updateTabaco(String value, String field, String cod) {
+        try {
+            PreparedStatement q = conn.prepareStatement("UPDATE DTabaco SET ".concat(field).concat(" = ? WHERE IDMARC = ?"));
+            q.setString(1, value);
+            q.setString(2, cod);
+            q.executeUpdate();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    public void addTabaco(MarcaTab m) {
+        try {
+            PreparedStatement q = conn.prepareStatement("INSERT INTO DTabaco (IDMARC,MARCA,ALQUIT,NICOT,CO) VALUES(?,?,?,?,?)");
+            q.setString(1, m.getCod());
+            q.setString(2, m.getMarca());
+            q.setString(3, m.getAlq());
+            q.setString(4, m.getNic());
+            q.setString(5, m.getCO());
+            q.executeUpdate();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+        }
+    }
+    
     public void updateFarmacosByIdFecha(String id, Date fecha, ObservableList<Tratamiento> list) {
         
         try {
@@ -224,4 +299,5 @@ public class getRegistroData {
         PreparedStatement q = conn.prepareStatement("SELECT * FROM DVadem WHERE FARM LIKE '%" + c +"%' ORDER BY FARM");
         return q.executeQuery();
     }
+
 }

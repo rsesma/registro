@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +22,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -211,22 +213,23 @@ public class FXMLidFechaController implements Initializable {
     @FXML
     private void deleteFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
-        if (p != null) {
-/*            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará el paciente seleccionado y todos los registros relacionados.\n\n ¿Desea continuar?");
+        Date f = (Date) this.fecha.getSelectionModel().getSelectedItem();
+        if (p != null & f != null) {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará la visita seleccionada y todos los registros relacionados.\n\n ¿Desea continuar?");
             confirm.setTitle("Eliminar");
             confirm.setHeaderText("Confirmar eliminación");
             Optional<ButtonType> result = confirm.showAndWait();
             if (result.get() == ButtonType.OK) {
                 try {
-                    if (this.d.deleteCensalbyID(p.getId())) {
-                        listaData.remove(p);
-                        count--;
-                        total.setText(count + " paciente(s)");
+                    String where = "IDPACV = ".concat(p.getId());
+                    where = where.concat(" AND FECHA = '").concat(f.toString()).concat("'");
+                    if (this.d.delete("Visitas",where)) {
+                        this.fecha.getItems().remove(f);
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }               
-            }*/
+            }
         }
     }
 
