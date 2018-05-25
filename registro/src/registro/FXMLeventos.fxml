@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="360.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLeventosController">
+   <children>
+      <Label layoutX="25.0" layoutY="20.0" text="Id. Pac." />
+      <TextField fx:id="id" disable="true" editable="false" layoutX="90.0" layoutY="15.0" prefHeight="27.0" prefWidth="82.0" />
+      <Label layoutX="25.0" layoutY="55.0" text="Fecha" />
+      <DatePicker fx:id="fecha" layoutX="90.0" layoutY="50.0" prefHeight="27.0" prefWidth="124.0" />
+      <Label layoutX="25.0" layoutY="90.0" text="Hora" />
+      <TextField fx:id="hh" layoutX="90.0" layoutY="85.0" prefHeight="27.0" prefWidth="35.0" />
+      <Label layoutX="128.0" layoutY="90.0" text=":" />
+      <TextField fx:id="mm" layoutX="135.0" layoutY="85.0" prefHeight="27.0" prefWidth="35.0" />
+      <Label layoutX="25.0" layoutY="135.0" text="Evento" />
+      <ComboBox fx:id="cie1" editable="true" layoutX="90.0" layoutY="130.0" prefHeight="27.0" prefWidth="494.0" />
+      <ComboBox fx:id="cie2" editable="true" layoutX="90.0" layoutY="165.0" prefHeight="27.0" prefWidth="494.0" />
+      <Label layoutX="25.0" layoutY="205.0" text="Notas" />
+      <TextArea fx:id="notas" layoutX="90.0" layoutY="205.0" prefHeight="100.0" prefWidth="494.0" />
+      <Button cancelButton="true" layoutX="412.0" layoutY="318.0" mnemonicParsing="false" onAction="#pbCancelar" prefHeight="30.0" prefWidth="80.0" text="Cancelar" />
+      <Button layoutX="504.0" layoutY="318.0" mnemonicParsing="false" onAction="#pbAceptar" prefHeight="30.0" prefWidth="80.0" text="Aceptar">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

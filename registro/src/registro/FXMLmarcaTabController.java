@@ -20,6 +20,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import registro.model.MarcaTab;
 import registro.model.getRegistroData;
@@ -57,6 +58,7 @@ public class FXMLmarcaTabController implements Initializable {
     private ObservableList<MarcaTab> data = FXCollections.observableArrayList();
     
     public getRegistroData d;
+    public Boolean changed = false;
 
     /**
      * Initializes the controller class.
@@ -105,6 +107,7 @@ public class FXMLmarcaTabController implements Initializable {
                     MarcaTab m = new MarcaTab(cod.getText(),marca.getText(),alq.getText(),nic.getText(),co.getText());
                     this.d.addTabaco(m);
                     this.data.add(m);
+                    this.changed = true;
                     
                     cod.setText("");
                     marca.setText("");
@@ -136,7 +139,9 @@ public class FXMLmarcaTabController implements Initializable {
         MarcaTab m = table.getSelectionModel().getSelectedItem();
         if (m != null) {
             if (!d.MarcaTabEnUso(m.getCod())) {
+                this.d.delTabaco(m);
                 data.remove(m);
+                this.changed = true;
             } else {
                 Alert a = new Alert(Alert.AlertType.WARNING, "La marca " + m.getMarca() + " está en uso");
                 a.setTitle("Atención");
@@ -145,6 +150,12 @@ public class FXMLmarcaTabController implements Initializable {
             }
             
         }
+    }
+
+    @FXML
+    void pbCerrar(ActionEvent event) {
+        Stage stage = (Stage) this.table.getScene().getWindow();
+        stage.close();
     }
     
     public void SetData(getRegistroData d) {
@@ -227,6 +238,7 @@ public class FXMLmarcaTabController implements Initializable {
             textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
                 if (!newValue) {
                     this.contr.d.updateTabaco(textField.getText(),this.field,this.contr.getCodMarcaSelected());
+                    this.contr.changed = true;
                     commitEdit(textField.getText());
                 }
             });

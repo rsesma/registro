@@ -11,7 +11,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import registro.FXMLregistroController.Forms;
@@ -95,6 +97,24 @@ public class getRegistroData {
             return true;
         }
     }
+
+    public Boolean EventoExists(String id, LocalDate d, LocalTime t) {
+        try {
+            PreparedStatement q = conn.prepareStatement("SELECT COUNT(IDPACN) AS N FROM Eventos WHERE IDPACN = ? AND FECHAN = ? AND HORAN = ?");
+            q.setString(1, id);
+            q.setDate(2, java.sql.Date.valueOf(d));
+            q.setTime(3, java.sql.Time.valueOf(t));
+            ResultSet rs = q.executeQuery();
+            rs.next();
+            Integer count = rs.getInt("N");
+            rs.close();
+            return (count>0);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+            return true;
+        }
+    }
     
     public Boolean update(String table, Controles c, String where) {
         String sql = "UPDATE ".concat(table).concat(" SET \n");
@@ -140,10 +160,13 @@ public class getRegistroData {
     }
     
     public ResultSet getFechasById(String id, Forms type) throws SQLException {
-        if (type == Forms.VISITAS) {
-            return conn.prepareStatement("SELECT FECHA FROM Visitas WHERE IDPACV = ".concat(id)).executeQuery();
-        } else {
-            return null;
+        switch (type) {
+            case VISITAS:
+                return conn.prepareStatement("SELECT FECHA FROM Visitas WHERE IDPACV = ".concat(id)).executeQuery();
+            case EVENTOS:
+                return conn.prepareStatement("SELECT * FROM Eventos WHERE IDPACN = ".concat(id)).executeQuery();
+            default:
+                return null;
         }
     }
     
@@ -184,6 +207,20 @@ public class getRegistroData {
         PreparedStatement q = conn.prepareStatement("SELECT * FROM CFarmacos WHERE IDPACF = ? AND FECHAF = ?");
         q.setString(1, id);
         q.setDate(2, fecha);
+        return q.executeQuery();
+    }
+
+    public ResultSet getEventos(String id, LocalDate date, LocalTime time) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM CEventos WHERE IDPACN = ? AND FECHAN = ? AND HORAN = ?");
+        q.setString(1, id);
+        q.setDate(2, Date.valueOf(date));
+        q.setTime(3, Time.valueOf(time));
+        return q.executeQuery();
+    }
+
+    public ResultSet getCIE10S(String cod1s) throws SQLException {
+        PreparedStatement q = conn.prepareStatement("SELECT * FROM CIE10S WHERE COD1S = ?");
+        q.setString(1, cod1s);
         return q.executeQuery();
     }
     
@@ -252,10 +289,24 @@ public class getRegistroData {
             PreparedStatement q = conn.prepareStatement("INSERT INTO DTabaco (IDMARC,MARCA,ALQUIT,NICOT,CO) VALUES(?,?,?,?,?)");
             q.setString(1, m.getCod());
             q.setString(2, m.getMarca());
-            q.setString(3, m.getAlq());
-            q.setString(4, m.getNic());
-            q.setString(5, m.getCO());
+            if (!m.getAlq().trim().isEmpty()) q.setString(3, m.getAlq());
+            else q.setNull(3,java.sql.Types.DECIMAL);
+            if (!m.getNic().trim().isEmpty()) q.setString(4, m.getNic());
+            else q.setNull(4,java.sql.Types.DECIMAL);
+            if (!m.getCO().trim().isEmpty()) q.setString(5, m.getCO());
+            else q.setNull(5,java.sql.Types.DECIMAL);
             q.executeUpdate();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
+            alert.showAndWait();
+        }
+    }
+    
+    public void delTabaco(MarcaTab m) {
+        try {
+            PreparedStatement q = conn.prepareStatement("DELETE FROM DTabaco WHERE IDMARC = ?");
+            q.setInt(1, Integer.parseInt(m.getCod()));
+            q.execute();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.WARNING, e.getMessage());
             alert.showAndWait();

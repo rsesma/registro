@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="432.0" prefWidth="543.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLmarcaTabController">
+<AnchorPane id="AnchorPane" prefHeight="464.0" prefWidth="543.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="registro.FXMLmarcaTabController">
    <children>
       <TableView fx:id="table" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="361.0" prefWidth="511.0">
         <columns>
@@ -25,5 +25,11 @@
       <TextField fx:id="co" layoutX="407.0" layoutY="384.0" prefHeight="27.0" prefWidth="50.0" promptText="CO" />
       <Button layoutX="465.0" layoutY="384.0" mnemonicParsing="false" onAction="#addMarca" text="+" />
       <Button layoutX="500.0" layoutY="384.0" mnemonicParsing="false" onAction="#delMarca" text="-" />
+      <Label layoutX="14.0" layoutY="427.0" text="ATENCIÓN! NO es posible deshacer los cambios">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button cancelButton="true" layoutX="468.0" layoutY="423.0" mnemonicParsing="false" onAction="#pbCerrar" text="Cerrar" />
    </children>
 </AnchorPane>

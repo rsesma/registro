@@ -32,6 +32,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import registro.model.Controles;
+import registro.model.Controles.Control;
+import registro.model.Controles.TipoCtrl;
 import registro.model.Tratamiento;
 import registro.model.getRegistroData;
 
@@ -226,8 +228,30 @@ public class FXMLVisitasController implements Initializable {
             FXMLmarcaTabController marca = fxml.<FXMLmarcaTabController>getController();
             marca.SetData(this.d);
             
+            String cod = "";
+            if (!this.marca.getSelectionModel().isEmpty()) {
+                String descrip = this.marca.getSelectionModel().getSelectedItem().toString();
+                cod = this.d.getCodFromDescrip("DTabaco","MARCA",descrip,"IDMARC");
+            }
+            
             stage.showAndWait();
             
+            if (marca.changed) {
+                // re-load marca de tabaco list
+                this.marca.getItems().clear();
+                ResultSet rs = d.getDic("DTabaco");
+                while (rs.next()) {
+                    this.marca.getItems().add(rs.getString("MARCA"));
+                }
+                rs.close();
+                
+                // assign previously selected marca
+                if (!cod.isEmpty()) {
+                    this.marca.setValue(this.d.getDescripFromCod("DTabaco", "IDMARC", Integer.parseInt(cod), "MARCA"));
+                } else {
+                    this.marca.setValue("");
+                }
+            }
         } catch (Exception e) {
             showError(e.getMessage(),"Error abriendo la ventana");
         }

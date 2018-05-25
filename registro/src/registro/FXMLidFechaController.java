@@ -36,6 +36,7 @@ import javafx.stage.Stage;
 import registro.FXMLregistroController.Forms;
 import registro.model.Paciente;
 import registro.model.getRegistroData;
+import java.text.SimpleDateFormat;
 
 /**
  * FXML Controller class
@@ -126,11 +127,22 @@ public class FXMLidFechaController implements Initializable {
 
     @FXML
     private void editFired(ActionEvent event) {
-        Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
+        Boolean ok = false;
+        Date fvis = null;
+        String fechaHora = "";
 
+        Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();        
         if (p != null) {
-            Date f = (Date) this.fecha.getSelectionModel().getSelectedItem();
-            if (f != null) {
+            if (this.form == Forms.VISITAS) {
+                fvis = (Date) this.fecha.getSelectionModel().getSelectedItem();
+                ok = (fvis!=null);
+            }
+            if (this.form == Forms.EVENTOS) {
+                fechaHora = (String) this.fecha.getSelectionModel().getSelectedItem();
+                ok = (fechaHora!=null);
+            }
+            
+            if (ok) {
                 Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL); 
                 FXMLLoader fxml;
@@ -143,7 +155,7 @@ public class FXMLidFechaController implements Initializable {
                             stage.setTitle("Visitas");
                             stage.setScene(new Scene(rVisitas));
                             FXMLVisitasController visitas = fxml.<FXMLVisitasController>getController();
-                            visitas.SetData(p.getId(), f, true, d);
+                            visitas.SetData(p.getId(), fvis, true, d);
 
                             stage.showAndWait();
 
@@ -153,12 +165,30 @@ public class FXMLidFechaController implements Initializable {
                             }
                             
                             break;
+                        case EVENTOS:
+                            fxml = new FXMLLoader(getClass().getResource("FXMLeventos.fxml")); 
+                            Parent rEventos = (Parent) fxml.load(); 
+                            stage.setTitle("Eventos");
+                            stage.setScene(new Scene(rEventos));
+                            FXMLeventosController eventos = fxml.<FXMLeventosController>getController();
+                            eventos.SetData(p.getId(), fechaHora, true, d);
+
+                            stage.showAndWait();
+
+/*                            if (visitas.changed) {
+                                LoadFechas(visitas.idPac);
+                                this.fecha.getSelectionModel().select(visitas.fVisita);
+                            }*/
+                            
+                            break;
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
             } else {
-                Alert wf = new Alert(Alert.AlertType.WARNING, "Seleccione una visita");
+                Alert wf = null;
+                if (this.form==Forms.VISITAS) wf = new Alert(Alert.AlertType.WARNING, "Seleccione una visita");
+                if (this.form==Forms.EVENTOS) wf = new Alert(Alert.AlertType.WARNING, "Seleccione un evento");
                 wf.setTitle("Seleccionar");
                 wf.setHeaderText("Falta información");
                 wf.showAndWait();
@@ -257,9 +287,18 @@ public class FXMLidFechaController implements Initializable {
     public void LoadFechas(String id) {
         this.fecha.getItems().clear();
         try {
-            ResultSet rs = this.d.getFechasById(id, this.form);
+            ResultSet rs;
+            rs = this.d.getFechasById(id, this.form);
             while(rs.next()){
-                this.fecha.getItems().add(rs.getDate("FECHA"));
+                switch (this.form) {
+                    case VISITAS:
+                        this.fecha.getItems().add(rs.getDate("FECHA"));
+                        break;
+                    case EVENTOS:
+                        SimpleDateFormat formatter = new SimpleDateFormat("HH:m");
+                        this.fecha.getItems().add(rs.getDate("FECHAN").toString() + " " + formatter.format(rs.getTime("HORAN")));
+                        break;
+                }
             }
         } catch(Exception e) {
             System.out.println(e.getMessage());
@@ -287,6 +326,9 @@ public class FXMLidFechaController implements Initializable {
         switch (this.form) {
             case VISITAS:
                 this.txFecha.setText("Visita:");
+                break;
+            case EVENTOS:
+                this.txFecha.setText("Eventos:");
                 break;
         }
     }

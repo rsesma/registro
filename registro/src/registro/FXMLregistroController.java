@@ -31,51 +31,56 @@ public class FXMLregistroController implements Initializable {
     
     @FXML
     private void openCensal(ActionEvent event) {
-        try {
-            // Launch new window
-            FXMLLoader fxmlId; 
-            fxmlId = new FXMLLoader(getClass().getResource("FXMLid.fxml"));
-            Parent rId = (Parent) fxmlId.load();
-            
-            Stage stage = new Stage(); 
-            stage.initModality(Modality.APPLICATION_MODAL); 
-            stage.setTitle("Escoger paciente");
-            stage.setScene(new Scene(rId));
-            
-            FXMLidController id = fxmlId.<FXMLidController>getController();
-            id.SetData(this.d);
-            
-            stage.showAndWait();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
+        open(Forms.CENSAL);
     }
 
     @FXML
     private void openVisitas(ActionEvent event) {
-        try {
-            // Launch new window
-            FXMLLoader fxml; 
-            fxml = new FXMLLoader(getClass().getResource("FXMLidFecha.fxml"));
-            Parent rIdFecha = (Parent) fxml.load();
-            
-            Stage stage = new Stage(); 
-            stage.initModality(Modality.APPLICATION_MODAL); 
-            stage.setTitle("Escoger visita");
-            stage.setScene(new Scene(rIdFecha));
-            
-            FXMLidFechaController idFecha = fxml.<FXMLidFechaController>getController();
-            idFecha.SetData(this.d,Forms.VISITAS);
-            
-            stage.showAndWait();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
+        open(Forms.VISITAS);
     }
 
     @FXML
     private void openEventos(ActionEvent event) {
-        //System.out.println("You clicked me!");
+        open(Forms.EVENTOS);
+    }
+    
+    public void open(Forms tipo) {
+        try {
+            // Launch new window
+            FXMLLoader fxml;
+            if (tipo == Forms.CENSAL) fxml = new FXMLLoader(getClass().getResource("FXMLid.fxml"));
+            else fxml = new FXMLLoader(getClass().getResource("FXMLidFecha.fxml"));
+            Parent r = (Parent) fxml.load();
+            
+            Stage stage = new Stage(); 
+            stage.initModality(Modality.APPLICATION_MODAL); 
+            stage.setScene(new Scene(r));            
+            switch (tipo) {
+                case CENSAL:
+                    stage.setTitle("Escoger paciente");
+                    break;
+                case VISITAS:
+                    stage.setTitle("Escoger visita");
+                    break;
+                case EVENTOS:
+                    stage.setTitle("Escoger evento");
+                    break;
+                default:
+                    break;
+            }
+
+            if (tipo == Forms.CENSAL) {
+                FXMLidController id = fxml.<FXMLidController>getController();
+                id.SetData(this.d);
+            } else {
+                FXMLidFechaController idFecha = fxml.<FXMLidFechaController>getController();
+                idFecha.SetData(this.d,tipo);
+            }
+            
+            stage.showAndWait();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }        
     }
 
     @FXML
