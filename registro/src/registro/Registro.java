@@ -23,25 +23,20 @@ public class Registro extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Boolean test = true;
         Boolean lContinue = true;
 
         // Launch login window
-        if (!test) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLlogin.fxml")); 
-            Parent r2 = (Parent) fxmlLoader.load(); 
-            Stage stage0 = new Stage(); 
-            stage0.initModality(Modality.WINDOW_MODAL);
-            stage0.setTitle("Log in");
-            stage0.setScene(new Scene(r2));
-            FXMLloginController login = fxmlLoader.<FXMLloginController>getController();
-            login.d = d;
-            login.lOk = false;
-            stage0.showAndWait();
-            lContinue = login.lOk;
-        } else {
-            d.getConnection("rsesma", "amsesr1977", "192.168.1.69");
-        }
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLlogin.fxml")); 
+        Parent r2 = (Parent) fxmlLoader.load(); 
+        Stage stage0 = new Stage(); 
+        stage0.initModality(Modality.WINDOW_MODAL);
+        stage0.setTitle("Entrar");
+        stage0.setScene(new Scene(r2));
+        FXMLloginController login = fxmlLoader.<FXMLloginController>getController();
+        login.d = d;
+        login.lOk = false;
+        stage0.showAndWait();
+        lContinue = login.lOk;
         
         if (lContinue) {
             // Launch main app window

@@ -64,8 +64,6 @@ public class FXMLCensalController implements Initializable {
     private RadioButton fem;
     @FXML
     private TextArea notes;
-    @FXML
-    private Button btExit;
 
     public String identifier;
     public Boolean edit;
@@ -109,11 +107,7 @@ public class FXMLCensalController implements Initializable {
         this.edit = lEdit;
         this.d = data;
         
-        this.btExit.setDisable(true);
-
         if (this.edit) {
-            this.btExit.setDisable(false);
-
             this.identifier = idPac;
             ResultSet rs;
             try {
@@ -163,11 +157,6 @@ public class FXMLCensalController implements Initializable {
     @FXML
     void pbCancelar(ActionEvent event) {
         closeWindow();
-    }
-
-    @FXML
-    void pbExitus(ActionEvent event) {
-
     }
 
     private void closeWindow() {

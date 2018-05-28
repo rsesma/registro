@@ -6,6 +6,7 @@
 package registro;
 
 import java.net.URL;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
+import registro.model.Controles;
 import registro.model.getRegistroData;
 
 /**
@@ -51,7 +53,7 @@ public class FXMLeventosController implements Initializable {
 
     private getRegistroData d;
     private Boolean edit;
-    private String idPac;
+    public String idPac;
     public LocalDate date;
     public LocalTime time;
     public Boolean changed = false;
@@ -90,7 +92,7 @@ public class FXMLeventosController implements Initializable {
         
         this.cie1.valueProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue ov, String t, String t1) {
-                loadCIE10S();
+                loadCIE10S(null);
             }
         });
     }
@@ -112,7 +114,6 @@ public class FXMLeventosController implements Initializable {
             c = c.concat(":").concat(fmt.format(Integer.parseInt(this.mm.getText().trim())));
             t = LocalTime.parse(c);
         }
-        System.out.println(t);
         
         if (f == null) {
             showError("La fecha del evento no puede quedar vacía", "Identificador vacío");
@@ -129,9 +130,45 @@ public class FXMLeventosController implements Initializable {
                 showError("La fecha del evento ya existe", "Identificador duplicado");
                 this.fecha.requestFocus();                
             } else {
-                //AQUÍ ME QUEDO: VALIDAR CONTENIDO COMBOS Y GRABAR
+                Boolean ok = true;
                 
-                closeWindow();
+                String cCIE1 = null;
+                String c = this.cie1.getEditor().getText();
+                if (!c.trim().isEmpty()) {
+                    if (!this.cie1.getItems().contains(c)) {
+                        ok = false;
+                        showError("El valor ".concat(c).concat(" no está en la lista"), "Error de validación");
+                        this.cie1.requestFocus();
+                    } else {
+                        cCIE1 = c.substring(0,3);
+                    }
+                }
+                
+                String cCIE2 = null;
+                c = this.cie2.getEditor().getText();
+                if (ok && !c.trim().isEmpty()) {
+                    if (!this.cie2.getItems().contains(c)) {
+                        ok = false;
+                        showError("El valor ".concat(c).concat(" no está en la lista"), "Error de validación");
+                        this.cie2.requestFocus();
+                    } else {
+                        cCIE2 = c.substring(0, 1);
+                    }
+                }
+                
+                if (ok) {
+                    if (this.edit) {
+                        this.d.updateEventos(this.idPac,f,t,cCIE1,cCIE2,this.notas.getText(),this.date,this.time);
+                    } else {
+                        this.d.addEventos(this.idPac,f,t,cCIE1,cCIE2,this.notas.getText());
+                    }
+                    
+                    this.changed = true;
+                    this.date = f;
+                    this.time = t;
+
+                    closeWindow();
+                }
             }
         }            
     }
@@ -164,7 +201,7 @@ public class FXMLeventosController implements Initializable {
                 rs = this.d.getEventos(this.idPac, this.date, this.time);
                 if (rs.next()) {
                     this.cie1.setValue(rs.getString("CIE1") + "  " + rs.getString("DESC1"));
-                    loadCIE10S();
+                    loadCIE10S(this.cie1.getValue().toString());
                     this.cie2.setValue(rs.getString("CIE2") + "  " + rs.getString("DESC2"));
                 }
                 rs.close();
@@ -178,11 +215,9 @@ public class FXMLeventosController implements Initializable {
         }
     }
     
-    public void loadCIE10S() {
+    public void loadCIE10S(String c) {
         try {
-            this.cie2.getItems().clear();
-            this.cie2.setValue("");
-            String c = this.cie1.getEditor().getText();
+            if (c==null) c = this.cie1.getEditor().getText();
             if (!c.trim().isEmpty()) {
                 ResultSet rs = this.d.getCIE10S(c.substring(0,3));
                 if (rs.next()) {
@@ -195,7 +230,6 @@ public class FXMLeventosController implements Initializable {
             
             if (!this.cie2.getItems().isEmpty()) TextFields.bindAutoCompletion(this.cie2.getEditor(), this.cie2.getItems());
         } catch (Exception e) {
-            System.out.println("error");
             System.out.println(e.getMessage());
         }
     }

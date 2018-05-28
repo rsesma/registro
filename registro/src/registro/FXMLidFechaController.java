@@ -37,6 +37,9 @@ import registro.FXMLregistroController.Forms;
 import registro.model.Paciente;
 import registro.model.getRegistroData;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * FXML Controller class
@@ -175,10 +178,11 @@ public class FXMLidFechaController implements Initializable {
 
                             stage.showAndWait();
 
-/*                            if (visitas.changed) {
-                                LoadFechas(visitas.idPac);
-                                this.fecha.getSelectionModel().select(visitas.fVisita);
-                            }*/
+                            if (eventos.changed) {
+                                LoadFechas(eventos.idPac);
+                                SimpleDateFormat formatter = new SimpleDateFormat("HH:m");
+                                this.fecha.getSelectionModel().select(eventos.date.toString() + " " + formatter.format(java.sql.Time.valueOf(eventos.time)));
+                            }
                             
                             break;
                     }
@@ -227,6 +231,24 @@ public class FXMLidFechaController implements Initializable {
                             }
                             
                             break;
+                        case EVENTOS:
+                            fxml = new FXMLLoader(getClass().getResource("FXMLeventos.fxml")); 
+                            Parent rEventos = (Parent) fxml.load(); 
+                            stage.setTitle("Eventos");
+                            stage.setScene(new Scene(rEventos));
+                            FXMLeventosController eventos = fxml.<FXMLeventosController>getController();
+                            eventos.SetData(p.getId(), "", false, d);
+
+                            stage.showAndWait();
+
+                            if (eventos.changed) {
+                                LoadFechas(eventos.idPac);
+                                SimpleDateFormat formatter = new SimpleDateFormat("HH:m");
+                                this.fecha.getSelectionModel().select(eventos.date.toString() + " " + formatter.format(java.sql.Time.valueOf(eventos.time)));
+                            }
+                            
+                            break;
+
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -243,23 +265,49 @@ public class FXMLidFechaController implements Initializable {
     @FXML
     private void deleteFired(ActionEvent event) {
         Paciente p = (Paciente) table.getSelectionModel().getSelectedItem();
-        Date f = (Date) this.fecha.getSelectionModel().getSelectedItem();
-        if (p != null & f != null) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará la visita seleccionada y todos los registros relacionados.\n\n ¿Desea continuar?");
-            confirm.setTitle("Eliminar");
-            confirm.setHeaderText("Confirmar eliminación");
-            Optional<ButtonType> result = confirm.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                try {
-                    String where = "IDPACV = ".concat(p.getId());
-                    where = where.concat(" AND FECHA = '").concat(f.toString()).concat("'");
-                    if (this.d.delete("Visitas",where)) {
-                        this.fecha.getItems().remove(f);
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }               
-            }
+        if (p != null) {
+            try {
+                switch (this.form) {
+                    case VISITAS:
+                        Date f = (Date) this.fecha.getSelectionModel().getSelectedItem();
+                        if (f != null) {
+                            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará la visita seleccionada y todos los registros relacionados.\n\n ¿Desea continuar?");
+                            confirm.setTitle("Eliminar");
+                            confirm.setHeaderText("Confirmar eliminación");
+                            Optional<ButtonType> result = confirm.showAndWait();
+                            if (result.get() == ButtonType.OK) {
+                                String where = "IDPACV = ".concat(p.getId());
+                                where = where.concat(" AND FECHA = '").concat(f.toString()).concat("'");
+                                if (this.d.delete("Visitas",where)) {
+                                    this.fecha.getItems().remove(f);
+                                }
+                            }
+                        }
+                        
+                        break;
+                    
+                    case EVENTOS:
+                        String fechaHora = (String) this.fecha.getSelectionModel().getSelectedItem();
+                        if (fechaHora!=null) {
+                            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Se borrará el evento seleccionado.\n\n ¿Desea continuar?");
+                            confirm.setTitle("Eliminar");
+                            confirm.setHeaderText("Confirmar eliminación");
+                            Optional<ButtonType> result = confirm.showAndWait();
+                            if (result.get() == ButtonType.OK) {
+                                LocalDate date = LocalDate.parse(fechaHora.split(" ")[0], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                                LocalTime time = LocalTime.parse(fechaHora.split(" ")[1]);
+                                this.d.delEventos(p.getId(), date, time);
+                                this.fecha.getItems().remove(fechaHora);
+                            }
+                        }
+                        
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }               
+
+                
         }
     }
 

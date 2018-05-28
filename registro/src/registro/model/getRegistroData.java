@@ -135,7 +135,7 @@ public class getRegistroData {
         sql = sql.concat(" WHERE ").concat(where);
         return executeSQL(sql,false);
     }
-    
+
     public Boolean executeSQL(String sql, Boolean update) {
         try {
             if (update) conn.prepareStatement(sql).executeUpdate();
@@ -146,6 +146,53 @@ public class getRegistroData {
             alert.showAndWait();
             return false;
         }        
+    }
+
+    public void updateEventos(String id, LocalDate f, LocalTime t, String cie1, String cie2, String notas, LocalDate f0, LocalTime t0) {
+        try {
+            PreparedStatement q = conn.prepareStatement("UPDATE Eventos SET FECHAN = ?, HORAN = ?, CIE1 = ?, CIE2 = ?, NOTASN = ? WHERE IDPACN = ? AND FECHAN = ? AND HORAN = ?");
+            q.setDate(1, java.sql.Date.valueOf(f));
+            q.setTime(2, java.sql.Time.valueOf(t));
+            q.setString(3, cie1);
+            q.setString(4, cie2);
+            q.setString(5, notas);
+            q.setString(6, id);
+            q.setDate(7, java.sql.Date.valueOf(f0));
+            q.setTime(8, java.sql.Time.valueOf(t0));
+            q.executeUpdate();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    public void addEventos(String id, LocalDate f, LocalTime t, String cie1, String cie2, String notas) {
+        try {
+            PreparedStatement q = conn.prepareStatement("INSERT INTO Eventos (IDPACN,FECHAN,HORAN,CIE1,CIE2,NOTASN) VALUES(?,?,?,?,?,?)");
+            q.setString(1, id);
+            q.setDate(2, java.sql.Date.valueOf(f));
+            q.setTime(3, java.sql.Time.valueOf(t));
+            q.setString(4, cie1);
+            q.setString(5, cie2);
+            q.setString(6, notas);
+            q.executeUpdate();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    public void delEventos(String id, LocalDate f, LocalTime t) {
+        try {
+            PreparedStatement q = conn.prepareStatement("DELETE FROM Eventos WHERE IDPACN=? AND FECHAN = ? AND HORAN = ?");
+            q.setString(1, id);
+            q.setDate(2, java.sql.Date.valueOf(f));
+            q.setTime(3, java.sql.Time.valueOf(t));
+            q.execute();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.showAndWait();
+        }
     }
         
     public Boolean deleteCensalbyID(String id) {
